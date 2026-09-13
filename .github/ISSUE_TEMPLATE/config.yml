@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用问题 / 经验交流
+    url: https://github.com/Shonean/af-fill/discussions
+    about: 安装使用、配置 LLM、某平台怎么填，来 Discussions
+  - name: 安全漏洞
+    url: https://github.com/Shonean/af-fill/security/advisories/new
+    about: 请勿公开 Issue，走 Security Advisories

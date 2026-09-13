@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安装依赖
+        run: |
+          pip install -r driver/requirements.txt
+          pip install pyinstaller
+          python -m playwright install chromium
+      - name: 版本一致性（引擎 @version == tag）
+        shell: pwsh
+        run: |
+          $m = Select-String -Path autofill.user.js -Pattern '@version\s+(\S+)'
+          $v = $m.Matches[0].Groups[1].Value
+          if ("v$v" -ne "${{ github.ref_name }}") { throw "engine @version v$v != tag ${{ github.ref_name }}" }
+      - name: 打包工作台 exe
+        run: python driver/build.py
+      - name: 压缩 + 校验和
+        shell: pwsh
+        run: |
+          $name = "AF-Fill-Workbench-${{ github.ref_name }}.zip"
+          Compress-Archive -Path "dist/AF工作台" -DestinationPath $name
+          $hash = (Get-FileHash $name -Algorithm SHA256).Hash
+          "$hash  $name" | Out-File -Encoding ascii SHA256SUMS.txt
+          Get-Content SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            autofill.user.js
+            AF-Fill-Workbench-${{ github.ref_name }}.zip
+            SHA256SUMS.txt
+          generate_release_notes: true

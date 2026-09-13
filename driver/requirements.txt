@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+playwright
+pystray
+pywebview
+pythonnet
+pillow

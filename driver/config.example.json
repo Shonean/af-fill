@@ -1,0 +1,16 @@
+{
+  "_说明": "配置示例（仅文档用）。首次启动 exe / workbench.py 时会自动在 data/ 生成 config.json；改这份示例不会生效，请改 data/config.json 或用工作台「设置」卡。",
+  "debugPort": 9222,
+  "edgeProfileDir": "C:\\Users\\<you>\\edge-af-profile",
+  "workbenchPort": 8790,
+  "llm": {
+    "baseUrl": "",
+    "apiKey": "",
+    "model": ""
+  },
+  "watch": {
+    "intervalHours": 0,
+    "expireDays": 30,
+    "filterPrompt": "（留空则用内置默认：按你的届别/岗位方向筛选招聘公告）"
+  }
+}

@@ -1,0 +1,34 @@
+name: 功能建议
+description: 新平台适配 / 新能力 / 体验改进
+title: '[Feature] '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你遇到的问题
+      placeholder: '在某类网申页上……无法自动处理'
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 期望的方案
+      placeholder: '支持XX平台的XX控件；或……'
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 类型
+      options:
+        - 新平台适配
+        - 字段/字典改进
+        - LLM 相关
+        - 工作台/驱动
+        - 文档
+        - 其它
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        安全硬约束不接受的功能：自动点击最终提交、自动上传文件、绕过验证码/登录风控。

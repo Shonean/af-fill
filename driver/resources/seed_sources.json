@@ -1,0 +1,16 @@
+{
+ "seq": 2,
+ "sources": [
+  {
+   "id": 1,
+   "name": "高顿央国企",
+   "url": "https://www.gwy.com/gqzp/",
+   "mode": "fetch",
+   "pages": 3,
+   "enabled": true,
+   "lastScan": "",
+   "lastNew": 0,
+   "lastFetched": 0
+  }
+ ]
+}

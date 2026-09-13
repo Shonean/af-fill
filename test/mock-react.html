@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>云帆招聘 · React 受控表单（Phase 2 验证页）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#EDEEF1;color:#26282E}
+.top{background:#fff;border-bottom:1px solid rgba(20,20,22,.1);padding:14px 22px;display:flex;gap:14px;align-items:baseline}
+.top b{font-size:15px}
+.top span{font-size:12px;color:#83858D}
+.tip{max-width:900px;margin:16px auto 0;padding:10px 16px;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:10px;font-size:12px;color:#7A6420}
+.wrap{max-width:900px;margin:18px auto 80px;padding:0 16px;display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+.card{background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:26px 30px 30px}
+h2{font-size:14.5px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+h2::before{content:"";width:3px;height:14px;background:#2F6F4F;border-radius:1px}
+h2 small{font-weight:400;font-size:11px;color:#9A9CA3}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;margin-top:14px}
+.f label{display:block;font-size:12px;color:#5A5C64;margin-bottom:5px}
+.f input,.f select,.f textarea{width:100%;font:13.5px/1.5 inherit;color:inherit;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:8px;padding:8px 11px}
+.f textarea{min-height:110px;resize:vertical;line-height:1.7}
+.edu-cards{display:grid;gap:14px;margin-top:14px}
+.edu-card{border:1px solid rgba(20,20,22,.12);border-radius:10px;padding:14px 16px 16px;position:relative}
+.edu-card .cap{font-size:12px;color:#2F6F4F;font-weight:500;margin-bottom:10px;display:flex;justify-content:space-between}
+.edu-card .g{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.edu-card .g .full{grid-column:1/-1}
+.edu-card input,.edu-card select{width:100%;font:13px/1.5 inherit;background:#FAFAFB;border:1px solid rgba(20,20,22,.12);border-radius:7px;padding:7px 10px}
+.side{position:sticky;top:16px;background:#141416;color:#E8E8EC;border-radius:12px;padding:16px 18px 18px;font:11px/1.7 ui-monospace,Consolas,monospace}
+.side h3{font:500 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#8B8D96;margin-bottom:10px}
+.side pre{white-space:pre-wrap;word-break:break-all;max-height:520px;overflow:auto;color:#B9E4C7}
+.side .live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4CC38A;margin-right:6px;vertical-align:1px}
+.submit{margin-top:20px;background:#2F6F4F;color:#fff;border:none;border-radius:9px;padding:10px 34px;font-size:13.5px;font-weight:500}
+.note{font-size:12px;color:#9A9CA3;margin-left:12px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top"><b>云帆招聘</b><span>2026 届校招 · React 18 受控表单 · Phase 2 验证页</span></div>
+<div class="tip" style="max-width:900px">
+本页用 <b>React 18（CDN UMD，无构建）</b>渲染全受控表单：每个 input 的值都由 React state 管理（value + onChange）。
+<b>Phase 2 验收标准</b>：AF-Fill 执行填充后，右侧 <b>Live State</b> 面板的 JSON 必须同步更新——只改 DOM 而框架没收到事件就会露馅。
+三张<b>块状教育卡片</b>（每张含完整字段集）用于验证块状重复组按 DOM 顺序取 profile.education[0..2]。
+本页直接内载了脚本本体（无需 Tampermonkey）：右下角白瓷球 → 打开面板 → 执行填充。
+</div>
+
+<div class="wrap">
+  <main class="card">
+    <h2>基本信息 <small>全受控 · onChange 同步 state</small></h2>
+    <div class="grid">
+      <div id="mount-form"></div>
+    </div>
+  </main>
+
+  <aside class="side">
+    <h3><span class="live"></span>LIVE STATE — 填充后这里必须变化</h3>
+    <pre id="state-view">…</pre>
+  </aside>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script>window.React || document.write('<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"><\/script>')</script>
+<script src="https://cdn.bootcdn.net/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>window.ReactDOM || document.write('<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"><\/script>')</script>
+<script>
+(function () {
+  const e = React.createElement;
+  const Initial = {
+    basic: { name: '', phone: '', email: '', cityExpected: '', selfIntro: '' },
+    education: [
+      { school: '', major: '', degree: '', range: '' },
+      { school: '', major: '', degree: '', range: '' },
+      { school: '', major: '', degree: '', range: '' }
+    ]
+  };
+  let setShared = null;
+
+  function App() {
+    const [st, setSt] = React.useState(Initial);
+    setShared = setSt;
+    React.useEffect(() => {
+      document.getElementById('state-view').textContent = JSON.stringify(st, null, 1);
+    }, [st]);
+    const setBasic = k => ev => setSt(s => ({ ...s, basic: { ...s.basic, [k]: ev.target.value } }));
+    const setEdu = (i, k) => ev => setSt(s => {
+      const ed = s.education.slice(); ed[i] = { ...ed[i], [k]: ev.target.value };
+      return { ...s, education: ed };
+    });
+    return e('form', { onSubmit: ev => ev.preventDefault() },
+      e('div', { className: 'grid', style: { marginTop: 14 } },
+        e('div', { className: 'f' },
+          e('label', { htmlFor: 'r-name' }, '姓名', e('span', { style: { color: '#C6484E' } }, '*')),
+          e('input', { id: 'r-name', type: 'text', value: st.basic.name, onChange: setBasic('name'), placeholder: '请输入真实姓名' })),
+        e('div', { className: 'f' },
+          e('label', { htmlFor: 'r-phone' }, '手机号', e('span', { style: { color: '#C6484E' } }, '*')),
+          e('input', { id: 'r-phone', type: 'tel', maxLength: 11, value: st.basic.phone, onChange: setBasic('phone'), placeholder: '11位手机号' })),
+        e('div', { className: 'f' },
+          e('label', { htmlFor: 'r-mail' }, '电子邮箱', e('span', { style: { color: '#C6484E' } }, '*')),
+          e('input', { id: 'r-mail', type: 'email', value: st.basic.email, onChange: setBasic('email'), placeholder: 'name@example.com' })),
+        e('div', { className: 'f' },
+          e('label', { htmlFor: 'r-city' }, '期望工作城市'),
+          e('select', { id: 'r-city', value: st.basic.cityExpected, onChange: setBasic('cityExpected') },
+            e('option', { value: '' }, '请选择'),
+            ['北京', '上海', '深圳', '杭州', '成都', '济南', '日照'].map(c => e('option', { key: c, value: c }, c)))),
+        e('div', { className: 'f', style: { gridColumn: '1/-1' } },
+          e('label', { htmlFor: 'r-intro' }, '自我介绍', e('span', { style: { color: '#C6484E' } }, '*')),
+          e('textarea', { id: 'r-intro', value: st.basic.selfIntro, onChange: setBasic('selfIntro'), placeholder: '300-600字' }))),
+      e('h2', { style: { marginTop: 26 } }, '教育经历 ', e('small', null, '块状重复组 · 每张卡片 = education[i] · 按 DOM 顺序取第 i 段')),
+      e('div', { className: 'edu-cards' },
+        st.education.map((ed, i) =>
+          e('div', { className: 'edu-card', key: i },
+            e('div', { className: 'cap' }, e('span', null, '教育经历 · 第 ' + (i + 1) + ' 段'), e('span', { style: { color: '#B6B8BF' } }, 'CARD #' + (i + 1))),
+            e('div', { className: 'g' },
+              e('div', null, e('label', null, '毕业院校'), e('input', { value: ed.school, onChange: setEdu(i, 'school'), placeholder: '学校全称' })),
+              e('div', null, e('label', null, '专业'), e('input', { value: ed.major, onChange: setEdu(i, 'major'), placeholder: '专业名称' })),
+              e('div', null, e('label', null, '学历'),
+                e('select', { value: ed.degree, onChange: setEdu(i, 'degree') },
+                  e('option', { value: '' }, '请选择'),
+                  ['本科', '硕士', '博士'].map(d => e('option', { key: d, value: d }, d)))),
+              e('div', null, e('label', null, '在校时间'), e('input', { value: ed.range, onChange: setEdu(i, 'range'), placeholder: '如 2022.09-2026.06' })))))),
+      e('button', { className: 'submit', type: 'submit' }, '提交申请'),
+      e('span', { className: 'note' }, 'AF-Fill 永远不会点击这个按钮')
+    );
+  }
+  const root = ReactDOM.createRoot(document.getElementById('mount-form'));
+  root.render(e(App, null));
+})();
+</script>
+<!-- AF-Fill 测试直载：脚本作为普通页面脚本运行（无 GM API 时自动回退 localStorage） -->
+<script src="../autofill.user.js"></script>
+</body>
+</html>

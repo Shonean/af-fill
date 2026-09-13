@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网申快填 · 工具UI设计预览 III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --panel:#FFFFFF;
+  --ink:#141416; --t2:#74757C; --t3:#A6A7AE;
+  --line:rgba(20,20,22,.10); --line2:rgba(20,20,22,.06);
+  --ok:#4C9E7E; --warn:#B98F35; --bad:#C6484E; --off:#B4B5BB;
+  --mono:'IBM Plex Mono','Consolas',monospace;
+  --sans:'Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+body{font-family:var(--sans);min-height:100vh;color:#41424A;
+  background:linear-gradient(90deg,#EFEFF1 0 50%,#1A1B1E 50% 100%);
+  background-attachment:fixed}
+@media (max-width:760px){ body{background:linear-gradient(180deg,#EFEFF1 0 42%,#1A1B1E 42% 100%)} }
+
+/* 顶部说明 */
+.cap{position:sticky;top:0;z-index:30;display:flex;align-items:baseline;gap:14px;
+  background:#fff;padding:13px 24px;border-bottom:1px solid var(--line)}
+.cap .wm{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--ink)}
+.cap span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--t3);margin-left:auto;text-align:right}
+
+.stage{position:relative;min-height:calc(100vh - 45px)}
+
+/* ===== 悬浮球：白瓷圆 + 黑发丝环 ===== */
+.ball{position:absolute;right:56px;bottom:56px;width:46px;height:46px;border-radius:50%;
+  background:#fff;border:1px solid rgba(20,20,22,.32);display:grid;place-items:center;
+  color:var(--ink);font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  box-shadow:0 12px 30px rgba(12,12,16,.16)}
+.ball i{position:absolute;top:-1px;left:50%;width:14px;height:1px;background:var(--ink);font-style:normal;
+  transform:translateX(-50%)}
+.ball-tag{position:absolute;right:118px;bottom:70px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.14em;color:var(--t3)}
+@media (max-width:760px){ .ball-tag{display:none} }
+
+/* ===== 主面板：白纸黑字 ===== */
+.panel{position:absolute;right:56px;top:64px;width:398px;max-width:calc(100vw - 40px);
+  background:var(--panel);border:1px solid rgba(20,20,22,.09);border-radius:16px;color:var(--ink);
+  box-shadow:0 32px 90px rgba(10,10,14,.14), 0 2px 6px rgba(10,10,14,.05)}
+.ph{display:flex;align-items:baseline;gap:10px;padding:18px 22px 14px}
+.ph .wm{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;font-weight:500}
+.ph .v{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3)}
+.ph .x{margin-left:auto;color:var(--t3);font-size:12px;width:20px;height:20px;display:grid;place-items:center}
+.tabs{display:flex;gap:24px;padding:0 22px;border-bottom:1px solid var(--line)}
+.tabs span{font-size:12px;color:var(--t2);padding:7px 1px 9px;position:relative}
+.tabs .on{color:var(--ink);font-weight:500}
+.tabs .on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--ink)}
+.meta{display:flex;align-items:center;padding:11px 22px 0;font-family:var(--mono);
+  font-size:9px;letter-spacing:.16em;color:var(--t3)}
+.meta b{font-weight:400;color:var(--t2)}
+.meta .vr{margin-left:auto;color:var(--t2)}
+.list{padding:5px 22px 6px}
+.lr{display:flex;align-items:center;gap:12px;padding:10.5px 0;border-bottom:1px solid var(--line2)}
+.lr:last-child{border-bottom:none}
+.lr .st{width:5px;height:5px;border-radius:50%;flex:none}
+.st.hi{background:var(--ok)} .st.mid{background:var(--warn)} .st.lo{background:var(--off)} .st.sen{background:var(--bad)}
+.lr .lb{font-size:12px;color:var(--t2);flex:none}
+.lr .lb.senl{color:var(--bad)}
+.lr .val{flex:1;min-width:0;font-family:var(--mono);font-size:11px;color:var(--ink);text-align:right;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .val.empty{color:var(--t3)}
+.lr .ck{width:14px;height:14px;border-radius:4px;flex:none;border:1px solid rgba(20,20,22,.28);position:relative}
+.lr .ck.on{background:var(--ink);border-color:var(--ink)}
+.lr .ck.on::after{content:"";position:absolute;left:4px;top:1.4px;width:4px;height:7.5px;
+  border:solid #fff;border-width:0 1.4px 1.4px 0;transform:rotate(42deg)}
+.lr .loc{flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--t2)}
+.lr.senr{box-shadow:inset 2px 0 0 var(--bad);padding-left:10px}
+.pf{padding:16px 22px 20px}
+.btn{width:100%;text-align:center;font-size:12.5px;letter-spacing:.08em;color:#fff;padding:11.5px 0;
+  border-radius:10px;background:var(--ink);font-weight:500}
+.pf .fine{margin-top:10px;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--t3)}
+
+/* toast：白胶囊黑发丝边 */
+.toast{position:absolute;left:50%;bottom:56px;transform:translateX(-50%);white-space:nowrap;
+  background:#fff;border:1px solid rgba(20,20,22,.16);border-radius:10px;color:var(--t2);
+  font-size:11.5px;padding:10px 18px;z-index:10;box-shadow:0 16px 44px rgba(10,10,14,.14)}
+.toast b{color:var(--ink);font-weight:500;font-family:var(--mono);font-size:11px}
+@media (max-width:760px){ .toast{white-space:normal;text-align:center;max-width:86vw} }
+
+/* ===== 其余 Tab ===== */
+.kits{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:30px 24px 70px}
+.kit{width:300px;max-width:94vw;background:#fff;border:1px solid rgba(20,20,22,.09);
+  border-radius:16px;color:var(--ink);padding:16px 20px 18px;
+  box-shadow:0 20px 55px rgba(10,10,14,.10)}
+.kit h4{font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:.22em;color:var(--t3);margin-bottom:4px}
+.kr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2);font-size:11.5px}
+.kr:last-child{border-bottom:none}
+.kr .lb{color:var(--t2);flex:none}
+.kr .lb.ink{color:var(--ink);font-weight:500}
+.kr .tx{flex:1;min-width:0;font-family:var(--mono);font-size:10px;color:var(--t3);text-align:right;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kr .mb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:#fff;
+  background:var(--ink);border-radius:7px;padding:4px 11px;flex:none}
+.kr .gb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--t2);
+  border:1px solid rgba(20,20,22,.2);border-radius:7px;padding:4px 11px;flex:none}
+.kr .sn{color:var(--warn);font-family:var(--mono);font-size:10px}
+.sw{width:30px;height:17px;border-radius:99px;background:rgba(20,20,22,.14);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:2.5px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 2.5px rgba(10,10,14,.25)}
+.sw.on{background:var(--ink)} .sw.on::after{left:15px}
+.json{font-family:var(--mono);font-size:9.5px;line-height:1.75;color:var(--t3);
+  padding:9px 0 11px;white-space:pre;overflow:hidden}
+.json .k{color:var(--t2)} .json .s{color:var(--ink)}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important} }
+</style>
+</head>
+<body>
+
+<div class="cap">
+  <span class="wm">AF-FILL</span>
+  <span>工具 UI 预览 III — 白纸黑字 · 黑白灰 · 无彩<br>画布左浅右深 = 任意网页之上都成立</span>
+</div>
+
+<div class="stage">
+
+  <div class="panel">
+    <div class="ph">
+      <span class="wm">AF-FILL</span><span class="v">v0.1</span><span class="x">✕</span>
+    </div>
+    <div class="tabs"><span class="on">填充</span><span>开放题</span><span>Profile</span><span>设置</span></div>
+    <div class="meta">SCAN 17 · <b>HIGH 11</b> · MID 1 · LOW 4 · SENS 1 <span class="vr">变体 · 默认</span></div>
+    <div class="list">
+      <div class="lr"><span class="st hi"></span><span class="lb">姓名</span><span class="val">李雷</span><span class="ck on"></span></div>
+      <div class="lr"><span class="st hi"></span><span class="lb">手机号</span><span class="val">13800138000</span><span class="ck on"></span></div>
+      <div class="lr"><span class="st hi"></span><span class="lb">电子邮箱</span><span class="val">lilei@example.com</span><span class="ck on"></span></div>
+      <div class="lr"><span class="st mid"></span><span class="lb">出生年月</span><span class="val">2002-03</span><span class="ck on"></span></div>
+      <div class="lr senr"><span class="st sen"></span><span class="lb senl">身份证号</span><span class="val empty">—</span><span class="ck"></span></div>
+      <div class="lr"><span class="st lo"></span><span class="lb">政治面貌</span><span class="val empty">需人工</span><span class="loc">定位</span></div>
+      <div class="lr"><span class="st lo"></span><span class="lb">教育②·院校</span><span class="val empty">无第2段</span><span class="loc">定位</span></div>
+      <div class="lr"><span class="st hi"></span><span class="lb">自我介绍</span><span class="val">面试官您好，我是{{name}}…</span><span class="ck on"></span></div>
+    </div>
+    <div class="pf">
+      <div class="btn">执行填充 · 仅勾选项</div>
+      <div class="fine">FILL 12 / SKIP 5 — 提交前请自行核对</div>
+    </div>
+  </div>
+
+  <div class="ball">AF<i></i></div>
+  <div class="ball-tag">悬浮球 · 白瓷</div>
+  <div class="toast">已填充 <b>12</b> 项 · 请核对后自行提交 — 脚本绝不替你提交</div>
+</div>
+
+<div class="kits">
+  <div class="kit">
+    <h4>TAB 02 · 开放题</h4>
+    <div class="kr"><span class="lb">自我介绍</span><span class="tx">TEXTAREA · 600</span></div>
+    <div class="kr" style="display:block">
+      <div style="display:flex;gap:8px;align-items:baseline">
+        <span class="lb ink">为什么选择我们 · 技术岗</span>
+        <span class="tx" style="flex:1">WHY-US</span>
+      </div>
+      <div style="font-size:10.5px;line-height:1.7;color:var(--t2);padding:5px 0 9px">我关注到{{company}}在核心业务上的技术投入…</div>
+      <div style="display:flex;gap:8px"><span class="mb">插入</span><span class="gb">复制</span></div>
+    </div>
+    <div class="kr"><span class="sn">⚠ 未解析占位符</span><span class="tx">标黄提醒 · 不静默留空</span></div>
+  </div>
+
+  <div class="kit">
+    <h4>TAB 03 · PROFILE</h4>
+    <div class="json"><span class="k">{</span>
+  <span class="k">"base"</span><span class="k">: {</span>
+    <span class="k">"basic"</span><span class="k">: {</span> <span class="k">"name"</span>: <span class="s">"李雷"</span> <span class="k">},</span>
+    <span class="k">"education"</span>: [ … ],
+    <span class="k">"openQuestions"</span>: [ … ]
+  <span class="k">},</span>
+  <span class="k">"variants"</span>: { … }
+<span class="k">}</span></div>
+    <div class="kr" style="border-top:1px solid var(--line2)"><span class="mb">校验并导入</span><span class="gb">复制导出</span></div>
+  </div>
+
+  <div class="kit">
+    <h4>TAB 04 · 设置</h4>
+    <div class="kr"><span class="lb ink">本站启用</span><span class="tx">此域名显示悬浮球</span><span class="sw on"></span></div>
+    <div class="kr"><span class="lb ink">Debug 模式</span><span class="tx">标注被识别控件</span><span class="sw"></span></div>
+    <div class="kr"><span class="lb ink">占位符上下文</span><span class="tx">{{COMPANY}} · 自动建议</span></div>
+  </div>
+</div>
+
+</body>
+</html>

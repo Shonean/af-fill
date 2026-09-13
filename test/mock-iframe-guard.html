@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>iframe 合并护栏测试（真表单 vs 无关嵌入）</title>
+<style>body{font:13px/1.6 system-ui,'Microsoft YaHei',sans-serif;background:#EDEEF1;padding:16px}iframe{border:1px solid #ccc;background:#fff}iframe.big{width:660px;height:680px}iframe.small{width:420px;height:260px;margin-left:16px}</style>
+</head>
+<body>
+<div style="display:flex;align-items:flex-start">
+  <iframe id="real" class="big" src="frame-form.html"></iframe>
+  <iframe id="garbage" class="small" src="frame-garbage.html"></iframe>
+</div>
+<div style="margin-top:12px">附件：<input type="file" id="f-cv"></div>
+<script src="../autofill.user.js"></script>
+</body>
+</html>

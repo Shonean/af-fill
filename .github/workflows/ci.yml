@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 引擎语法
+        run: node --check autofill.user.js
+      - name: VT 纯函数测试
+        run: node test/_vt_tests.js
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 隐私/密钥扫描
+        run: python scripts/check_secrets.py
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 安装 Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: 全部离线回归
+        run: python test/run_all.py
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

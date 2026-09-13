@@ -1,0 +1,33 @@
+# ---- build outputs ----
+dist/
+build_work/
+build_dist/
+driver/build_artifacts/
+
+# ---- runtime & personal data (never commit) ----
+data/
+profile/profile.json
+driver/config.json
+driver/ledger.json
+driver/watch/*.json
+driver/logs/
+driver/backup/
+driver/webview2/
+backup/
+tools/sanitize.local.json
+test/fixture/profile.local.json
+
+# ---- caches / logs ----
+__pycache__/
+*.py[cod]
+*.log
+
+# ---- temp / os junk ----
+test/_tmp_upload.pdf
+*.lnk
+.DS_Store
+Thumbs.db
+
+# ---- editors ----
+.vscode/
+.idea/

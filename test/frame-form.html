@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>填写报名信息（iframe 内表单）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:13px/1.7 system-ui,'PingFang SC','Microsoft YaHei',sans-serif;background:#fff;color:#26282E;padding:20px 24px 60px}
+h3{font-size:13.5px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+h3::before{content:"";width:3px;height:13px;background:#3E6FB0;border-radius:1px}
+.sub{font-size:11px;color:#9A9CA3;margin-bottom:12px}
+table.form{width:100%;border-collapse:collapse}
+table.form th{font-weight:400;color:#5A5C64;font-size:12px;text-align:left;padding:7px 8px;width:170px;background:#F7F8FA;border:1px solid rgba(20,20,22,.08)}
+table.form td{padding:5px 8px;border:1px solid rgba(20,20,22,.08)}
+table.form input[type=text],table.form select{width:100%;font:13px/1.5 inherit;background:#fff;border:1px solid rgba(20,20,22,.14);border-radius:6px;padding:6px 9px}
+.ckline{display:flex;align-items:center;gap:6px;font-size:13px;margin-top:10px}
+</style>
+</head>
+<body>
+<h3>填写报名信息</h3>
+<div class="sub">本页运行在 iframe 里 —— 右下角只有一枚小「AF」迷你按钮（子框架模式），面板在父页面。</div>
+<table class="form">
+  <tr><th>姓名</th><td><input type="text" name="cand_name"></td></tr>
+  <tr><th>手机号码</th><td><input type="text" name="mobile"></td></tr>
+  <tr><th>电子邮箱</th><td><input type="text" name="email"></td></tr>
+  <tr><th>毕业院校</th><td><input type="text" name="grad_school"></td></tr>
+  <tr><th>所学专业</th><td><input type="text" name="major"></td></tr>
+  <tr><th>学历</th><td>
+    <select name="degree"><option value="">请选择</option><option>大专</option><option>本科</option><option>硕士</option><option>博士</option></select>
+  </td></tr>
+  <tr><th>在校时间</th><td><input type="text" name="school_range" placeholder="如 2022.09-2026.06"></td></tr>
+  <tr><th>期望月薪</th><td>
+    <select name="salary"><option value="">请选择</option><option>8k以下</option><option>8k-12k</option><option>12k-16k</option><option>16k-20k</option><option>20k以上</option></select>
+  </td></tr>
+</table>
+<div class="ckline"><label><input type="radio" name="obey" value="是">是</label>
+  <label><input type="radio" name="obey" value="否">否</label>
+  <span style="font-size:12px;color:#5A5C64">是否愿意服从岗位调剂</span></div>
+<script src="../autofill.user.js"></script>
+</body>
+</html>

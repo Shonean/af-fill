@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>翼帆集团招聘 · 官网自研（iframe 桥接验证页）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#F0F2F5;color:#26282E}
+.top{background:#1F3A5F;color:#fff;padding:16px 24px;display:flex;gap:14px;align-items:baseline}
+.top b{font-size:16px}
+.top span{font-size:12px;color:#B8C6D9}
+.tip{max-width:960px;margin:16px auto 0;padding:10px 16px;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:10px;font-size:12px;color:#7A6420}
+.job{max-width:960px;margin:18px auto 30px;padding:0 16px}
+.jobcard{background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:24px 30px;margin-bottom:18px}
+.jobcard h2{font-size:16px;margin-bottom:8px}
+.jobcard p{font-size:13px;color:#5A5C64;line-height:1.9}
+.framebox{background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;overflow:hidden}
+.framebox .cap{padding:12px 18px;border-bottom:1px solid rgba(20,20,22,.08);font-size:13px;font-weight:500}
+iframe{display:block;width:100%;height:760px;border:none}
+</style>
+</head>
+<body>
+<div class="top"><b>翼帆集团</b><span>2026 届校园招聘 · 招聘官网（外层页）· Phase 3 桥接验证</span></div>
+<div class="tip" style="max-width:960px">
+模拟北森模式的<b>外层官网 + iframe 内嵌报名表</b>结构（真实北森正是如此）。<b>Phase 3 验收</b>：
+① 外层页右下角白瓷球（完整面板）；② iframe 内的表单字段在扫描后被并入清单，标签带 <b>[子框架·127.0.0.1]</b> 前缀；
+③ 执行填充时值被逐行转发进 iframe 并正确写入；④ iframe 右下角还有一枚小 AF 迷你按钮（兜底：两击 = 先扫描后填充）。
+本页与内页都直接内载了脚本本体。
+</div>
+<div class="job">
+  <div class="jobcard">
+    <h2>软件开发工程师（2026 届校招）</h2>
+    <p>岗位职责：参与集团核心业务系统的设计与开发；负责模块编码、联调与性能优化。<br>
+    任职要求：本科及以上学历，计算机相关专业；熟悉 Java/Python 任一语言；有实习或项目经验者优先。</p>
+  </div>
+  <div class="framebox">
+    <div class="cap">报名表（iframe 内嵌 — 北森 ATS）</div>
+    <iframe id="ats-frame" src="frame-form.html"></iframe>
+  </div>
+</div>
+<script src="../autofill.user.js"></script>
+</body>
+</html>

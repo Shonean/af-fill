@@ -1,0 +1,10 @@
+{
+  "_说明": "复制本文件为 tools/sanitize.local.json（已 gitignore）并替换成你自己的敏感词。words 里的字符串会用于：① driver/build.py 打包后断言 dist 产物不含它们 ② scripts/check_secrets.py 全库扫描（含 CI）。把真名/手机号/邮箱/身份证/学校/公司/亲属姓名等一切不希望出现在公开仓库和分发 exe 里的内容都列进来。",
+  "words": [
+    "张三",
+    "13800138000",
+    "zhangsan@example.com",
+    "某某大学",
+    "某某有限公司"
+  ]
+}

@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网申快填效果演示</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ 页面 token（浅色基准，深色仅重定义） ============ */
+:root{
+  --bg:#F2F2F4; --paper:#FFFFFF; --surface:#F7F7F8;
+  --ink:#141416; --ink2:#74757C; --ink3:#A6A7AE;
+  --line:rgba(20,20,22,.10); --line2:rgba(20,20,22,.06);
+  --brand:#5B6B7E;                       /* 模拟 ATS 的"企业色"，刻意平凡 */
+  --ok:#4C9E7E; --ok-dot:#4C9E7E; --warn:#B98F35; --warn-dot:#D2A63C;
+  --bad:#C6484E; --off:#B4B5BB; --off-dot:#B4B5BB;
+  --mono:'IBM Plex Mono','Consolas',monospace;
+  --sans:'Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141519; --paper:#1D1E24; --surface:#23242B;
+  --ink:#E8E9EE; --ink2:#A6AAB6; --ink3:#6B7080;
+  --line:rgba(235,235,240,.12); --line2:rgba(235,235,240,.07);
+  --brand:#8B98AB;
+}}
+:root[data-theme="dark"]{
+  --bg:#141519; --paper:#1D1E24; --surface:#23242B;
+  --ink:#E8E9EE; --ink2:#A6AAB6; --ink3:#6B7080;
+  --line:rgba(235,235,240,.12); --line2:rgba(235,235,240,.07);
+  --brand:#8B98AB;
+}
+
+/* ============ base ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);
+  font-size:14px;line-height:1.6;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+::placeholder{color:var(--ink3)}
+
+/* ============ 顶部说明条 ============ */
+.strip{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:12px 22px;border-bottom:1px solid var(--line);
+  background:var(--paper);position:sticky;top:0;z-index:50}
+.strip .logo{display:flex;align-items:baseline;gap:10px}
+.strip .logo .wm{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.2em;color:var(--ink)}
+.strip .logo em{font-style:normal;font-size:11px;color:var(--ink3)}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.step{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink2);
+  border:1px solid var(--line);border-radius:99px;padding:3px 12px;background:var(--paper)}
+.step b{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink);font-weight:500}
+.reset{font-size:11.5px;color:var(--ink2);background:var(--paper);border:1px solid var(--line2);
+  border-radius:8px;padding:4px 13px;transition:.15s}
+.reset:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ============ 模拟网申页面（刻意平凡的企业风） ============ */
+.ats{max-width:760px;margin:26px auto 140px;padding:0 18px}
+.ats-head{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--paper);
+  border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0}
+.ats-head .corp{font-weight:500;font-size:14px}
+.ats-head .pos{font-size:12px;color:var(--ink2)}
+.injected{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink);
+  background:var(--paper);border:1px solid rgba(20,20,22,.22);border-radius:99px;
+  padding:3px 12px;cursor:pointer;white-space:nowrap;font-family:var(--mono);letter-spacing:.06em}
+.injected i{width:6px;height:6px;border-radius:50%;background:var(--ink);font-style:normal}
+.ats-body{background:var(--paper);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:28px 30px 32px}
+.sec-title{display:flex;align-items:baseline;gap:10px;font-weight:500;font-size:14.5px;margin:28px 0 4px}
+.sec-title:first-child{margin-top:0}
+.sec-title::before{content:"";width:3px;height:14px;border-radius:1px;background:var(--brand);align-self:center}
+.sec-title small{font-size:11px;font-weight:400;color:var(--ink3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;margin-top:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 22px;margin-top:12px}
+.fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:5px}
+.fld label .req{color:var(--bad);margin-left:2px}
+.fld input[type=text],.fld select,.fld textarea{
+  width:100%;font-size:13.5px;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:8px 11px;transition:border-color .15s}
+.fld textarea{resize:vertical;line-height:1.7;min-height:120px}
+.fld input:hover,.fld select:hover,.fld textarea:hover{border-color:var(--ink2)}
+.radios{display:flex;gap:18px;padding:8px 2px}
+.radios label{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink);cursor:pointer;margin:0}
+.radios input{accent-color:var(--brand);width:15px;height:15px}
+.edu-block{border:1px dashed var(--line);border-radius:10px;padding:16px 16px 4px;margin-top:12px;position:relative}
+.edu-block .blk-tag{position:absolute;top:-8px;left:14px;font-size:9.5px;color:var(--ink3);
+  background:var(--paper);padding:0 8px;font-family:var(--mono);letter-spacing:.1em}
+.form-foot{display:flex;align-items:center;gap:14px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+.submit{background:var(--brand);color:#fff;border:none;border-radius:9px;padding:10px 34px;
+  font-size:13.5px;font-weight:500;transition:.15s;letter-spacing:.04em}
+.submit:hover{filter:brightness(1.08)}
+.form-foot .note{font-size:12px;color:var(--ink3)}
+.demo-flag{margin-top:14px;font-size:11px;color:var(--ink3);text-align:center;font-family:var(--mono);letter-spacing:.06em}
+
+/* 填充后的闪烁与提示（功能性动效，保留） */
+@keyframes flashRing{0%{box-shadow:0 0 0 0 rgba(20,20,22,.35)}100%{box-shadow:0 0 0 9px rgba(20,20,22,0)}}
+.fld.flashV input,.fld.flashV select,.fld.flashV textarea{border-color:var(--ink);
+  animation:flashRing .9s ease-out 2}
+.fld.flashY input,.fld.flashY select,.fld.flashY textarea{border-color:var(--warn-dot);
+  animation:flashRing .9s ease-out 2}
+.fld.markBad input,.fld.markBad select,.fld.markBad textarea{border-color:var(--bad)!important}
+.fld{position:relative}
+.fld .dbg-chip{position:absolute;right:6px;top:-16px;font-size:9px;font-family:var(--mono);
+  letter-spacing:.08em;color:var(--ink2);background:var(--paper);border:1px solid var(--line);
+  border-radius:4px;padding:0 5px;display:none;pointer-events:none;white-space:nowrap;z-index:2}
+body.debug .fld{outline:1.5px dashed rgba(20,20,22,.4);outline-offset:2px;border-radius:6px}
+body.debug .fld .dbg-chip{display:block}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) body.debug .fld{outline-color:rgba(235,235,240,.4)} }
+:root[data-theme="dark"] body.debug .fld{outline-color:rgba(235,235,240,.4)}
+
+/* ============ 悬浮球：白瓷 · 静 ============ */
+#ball{position:fixed;right:26px;bottom:26px;width:48px;height:48px;border-radius:50%;
+  background:#FFFFFF;border:1px solid rgba(20,20,22,.32);color:#141416;
+  font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.08em;
+  display:grid;place-items:center;z-index:2147483000;cursor:grab;touch-action:none;user-select:none;
+  box-shadow:0 12px 30px rgba(12,12,16,.18)}
+#ball:active{cursor:grabbing}
+#ball i{position:absolute;top:-1px;left:50%;width:14px;height:1px;background:#141416;
+  transform:translateX(-50%);font-style:normal}
+
+/* ============ 面板：白纸黑字（工具 UI 不随宿主主题变化） ============ */
+#panel{position:fixed;right:26px;bottom:88px;width:398px;max-width:calc(100vw - 24px);
+  max-height:min(660px,calc(100vh - 128px));display:flex;flex-direction:column;
+  background:#FFFFFF;border:1px solid rgba(20,20,22,.09);border-radius:16px;z-index:2147483001;
+  color:#141416;
+  box-shadow:0 32px 90px rgba(10,10,14,.16), 0 2px 6px rgba(10,10,14,.06);
+  transform-origin:bottom right;transition:transform .2s ease,opacity .2s ease}
+#panel.hidden{transform:scale(.97) translateY(8px);opacity:0;pointer-events:none}
+.p-head{display:flex;align-items:baseline;gap:10px;padding:17px 20px 13px}
+.p-head .wm{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.2em}
+.p-head .v{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#A6A7AE}
+.p-head .close{margin-left:auto;background:none;border:none;color:#A6A7AE;font-size:13px;
+  width:22px;height:22px;border-radius:6px;line-height:1}
+.p-head .close:hover{color:#141416}
+.tabs{display:flex;gap:24px;padding:0 20px;border-bottom:1px solid rgba(20,20,22,.10)}
+.tab{background:none;border:none;font-size:12px;color:#74757C;padding:7px 1px 9px;position:relative}
+.tab.on{color:#141416;font-weight:500}
+.tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:#141416}
+.p-body{overflow-y:auto;padding:13px 20px 16px;flex:1;min-height:220px}
+.pane{display:none}
+.pane.on{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 填充 Tab */
+.bar{display:flex;gap:8px;margin-bottom:11px}
+.bar select{flex:1;font-size:12px;background:#F7F7F8;border:1px solid rgba(20,20,22,.14);
+  border-radius:8px;padding:7px 9px;color:#141416}
+.btn{border:none;border-radius:9px;font-size:12px;font-weight:500;padding:8px 15px;
+  transition:.15s;letter-spacing:.04em}
+.btn.pri{background:#141416;color:#fff}
+.btn.pri:hover{background:#2A2A2E}
+.btn.pri:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:#fff;border:1px solid rgba(20,20,22,.2);color:#74757C}
+.btn.ghost:hover{border-color:#141416;color:#141416}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;color:#A6A7AE;margin-bottom:9px}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:5px;height:5px;border-radius:50%;font-style:normal}
+.stats{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.14em;color:#A6A7AE}
+.stats .chip{display:flex;align-items:center;gap:5px;background:none;border:none;padding:0;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#A6A7AE}
+.stats .chip b{font-weight:500;color:#74757C}
+.stats .chip i{width:5px;height:5px;border-radius:50%;font-style:normal}
+
+/* 扫描行：发丝列表 */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:11px;padding:9.5px 0;
+  border-bottom:1px solid rgba(20,20,22,.06);animation:fadeUp .3s ease backwards}
+.row .dot{width:5px;height:5px;border-radius:50%;flex:none}
+.row.c-high .dot{background:#4C9E7E}
+.row.c-mid .dot{background:#D2A63C}
+.row.c-low .dot{background:#B4B5BB}
+.row.c-sen{box-shadow:inset 2px 0 0 #C6484E;padding-left:10px}
+.row.c-sen .dot{background:#C6484E}
+.row .lb{font-size:12px;color:#74757C;width:92px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.c-sen .lb{color:#C6484E}
+.row .val{flex:1;min-width:0;font-family:var(--mono);font-size:11px;background:transparent;
+  border:1px solid transparent;border-radius:5px;padding:3px 6px;color:#141416;text-align:right;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:border-color .15s}
+.row .val:hover,.row .val:focus{border-color:rgba(20,20,22,.2);background:#fff}
+.row .val:disabled{color:#A6A7AE;text-align:right}
+.row.c-low .val{color:#A6A7AE;border-style:dashed;border-color:rgba(20,20,22,.14)}
+.row.done .val{color:#141416}
+.row .ck{width:14px;height:14px;border-radius:4px;flex:none;appearance:none;-webkit-appearance:none;
+  border:1px solid rgba(20,20,22,.28);background:#fff;position:relative;margin:0;cursor:pointer}
+.row .ck:checked{background:#141416;border-color:#141416}
+.row .ck:checked::after{content:"";position:absolute;left:4px;top:1.4px;width:4px;height:7.5px;
+  border:solid #fff;border-width:0 1.4px 1.4px 0;transform:rotate(42deg)}
+.row .ck:disabled{opacity:.35;cursor:not-allowed}
+.row.warnfill .val{color:#B98F35}
+.loc{flex:none;background:none;border:none;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;color:#74757C;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.loc:hover{color:#141416}
+.rownote{font-size:10.5px;color:#A6A7AE;padding:0 0 7px 16px;margin-top:-5px;
+  border-bottom:1px solid rgba(20,20,22,.06)}
+.row.is-sen + .rownote{color:#C6484E}
+.hint{font-size:11px;color:#A6A7AE;line-height:1.7;margin:10px 0 0}
+.p-foot{border-top:1px solid rgba(20,20,22,.10);padding:13px 20px 15px}
+.fillbtn{width:100%;padding:11px;font-size:12.5px;letter-spacing:.08em;border-radius:10px;
+  background:#141416;color:#fff;border:none;font-weight:500}
+.fillbtn:hover{background:#2A2A2E}
+.fillbtn:disabled{opacity:.4;cursor:not-allowed}
+.fillbtn .fine{display:block;font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.55);
+  font-family:var(--mono);margin-top:3px;font-weight:400}
+.done-banner{display:none;background:#F7F7F8;border:1px solid rgba(20,20,22,.08);border-radius:9px;
+  padding:9px 12px;font-size:11.5px;color:#141416;line-height:1.65;margin-bottom:10px}
+.done-banner.on{display:block}
+.done-banner b{font-family:var(--mono);font-weight:500}
+
+/* 开放题 Tab */
+.oq-detect{font-size:11.5px;color:#74757C;padding:9px 0 11px;border-bottom:1px solid rgba(20,20,22,.06);
+  display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.oq-detect i{width:5px;height:5px;border-radius:50%;background:#4C9E7E;font-style:normal;flex:none}
+.oq-card{border-bottom:1px solid rgba(20,20,22,.06);padding:11px 0}
+.oq-card:last-of-type{border-bottom:none}
+.oq-card .tt{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}
+.oq-card .tt b{font-size:12px;font-weight:500}
+.oq-card .tt .ty{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:#A6A7AE;margin-left:auto}
+.oq-card .pv{font-size:11px;color:#74757C;line-height:1.7;display:-webkit-box;
+  -webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.oq-card .pv b{color:#B98F35;font-weight:400;font-family:var(--mono);font-size:10px}
+.oq-card .ops{display:flex;gap:8px;margin-top:9px}
+.oq-card .ops .btn{font-size:10px;padding:4px 12px;border-radius:7px}
+
+/* Profile Tab */
+.profile-view{font-family:var(--mono);font-size:10px;line-height:1.7;color:#74757C;
+  background:#F7F7F8;border:1px solid rgba(20,20,22,.08);border-radius:9px;padding:11px 13px;
+  max-height:180px;overflow:auto;white-space:pre;margin-bottom:10px}
+.imp-area{width:100%;font-family:var(--mono);font-size:10.5px;border:1px dashed rgba(20,20,22,.22);
+  border-radius:9px;padding:9px 11px;min-height:72px;resize:vertical;background:#fff;
+  color:#141416;margin-bottom:8px}
+.imp-msg{font-size:11px;border-radius:7px;padding:6px 10px;margin-bottom:8px;display:none;line-height:1.6}
+.imp-msg.ok{display:block;background:#F7F7F8;color:#141416;border:1px solid rgba(20,20,22,.08)}
+.imp-msg.err{display:block;color:#C6484E;border:1px solid rgba(198,72,78,.3)}
+.oprow{display:flex;gap:8px}
+
+/* 设置 Tab */
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 0;border-bottom:1px solid rgba(20,20,22,.06)}
+.set-row:last-of-type{border-bottom:none}
+.set-row .sl{font-size:12px}
+.set-row .sl small{display:block;font-size:10px;color:#A6A7AE;line-height:1.5;margin-top:1px}
+.sw{width:32px;height:18px;border-radius:99px;background:rgba(20,20,22,.14);border:none;position:relative;
+  transition:.18s;flex:none}
+.sw::after{content:"";position:absolute;top:2.5px;left:3px;width:13px;height:13px;border-radius:50%;
+  background:#fff;transition:.18s;box-shadow:0 1px 2.5px rgba(10,10,14,.25)}
+.sw.on{background:#141416}
+.sw.on::after{left:16px}
+.set-input{width:100%;font-size:12px;background:#F7F7F8;border:1px solid rgba(20,20,22,.14);
+  border-radius:8px;padding:7px 10px;margin:5px 0 11px;color:#141416}
+
+/* toast：白胶囊 · 黑发丝边 */
+#toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(14px);
+  background:#fff;border:1px solid rgba(20,20,22,.18);color:#74757C;font-size:11.5px;
+  border-radius:10px;padding:10px 19px;opacity:0;pointer-events:none;transition:.25s;
+  z-index:2147483002;max-width:86vw;text-align:center;box-shadow:0 16px 44px rgba(10,10,14,.16)}
+#toast.on{opacity:1;transform:translateX(-50%)}
+#toast b{color:#141416;font-family:var(--mono);font-weight:500}
+#toast.warn{border-color:rgba(210,166,60,.55);color:#141416}
+#toast.bad{border-color:rgba(198,72,78,.55);color:#C6484E}
+
+/* 停用恢复球 */
+#revive{position:fixed;right:26px;bottom:26px;z-index:2147483000;display:none;
+  font-size:11px;color:#141416;background:#fff;border:1px solid rgba(20,20,22,.28);
+  border-radius:99px;padding:8px 15px;box-shadow:0 12px 30px rgba(12,12,16,.18)}
+#revive.on{display:block}
+#revive:hover{border-color:#141416}
+
+@media (max-width:560px){
+  .strip{padding:10px 14px;gap:8px}
+  .steps{margin-left:0}
+  .ats-body{padding:20px 16px 24px}
+  .grid2,.grid3{grid-template-columns:1fr}
+  #panel{right:12px;bottom:82px;max-height:calc(100vh - 108px)}
+  #ball{right:16px;bottom:16px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部说明条（演示页自带，非脚本部分） ===== -->
+<header class="strip">
+  <div class="logo"><span class="wm">AF-FILL</span><em>效果演示 · 下方为模拟网申页面</em></div>
+  <div class="steps">
+    <span class="step"><b>01</b>点右下角悬浮球</span>
+    <span class="step"><b>02</b>扫描表单 · 核对清单</span>
+    <span class="step"><b>03</b>执行填充 · 自己检查</span>
+  </div>
+  <button class="reset" id="btnReset" type="button">重置演示</button>
+</header>
+
+<!-- ===== 模拟网申表单页 ===== -->
+<main class="ats">
+  <div class="ats-head">
+    <div>
+      <div class="corp">启明信息技术有限公司 · 2026 届校园招聘</div>
+      <div class="pos">应聘岗位：研发工程师（应届） · 网申进度 2/3</div>
+    </div>
+    <button class="injected" id="injectedPill" type="button"><i></i>AF-FILL 已注入</button>
+  </div>
+  <div class="ats-body">
+
+    <div class="sec-title">基本信息</div>
+    <div class="grid2">
+      <div class="fld" data-f="name"><span class="dbg-chip"></span><label>姓名<span class="req">*</span></label><input type="text" placeholder="请输入真实姓名"></div>
+      <div class="fld" data-f="phone"><span class="dbg-chip"></span><label>手机号<span class="req">*</span></label><input type="text" placeholder="请输入11位手机号" maxlength="11"></div>
+      <div class="fld" data-f="email"><span class="dbg-chip"></span><label>电子邮箱<span class="req">*</span></label><input type="text" placeholder="请输入常用邮箱"></div>
+      <div class="fld" data-f="gender"><span class="dbg-chip"></span><label>性别<span class="req">*</span></label>
+        <div class="radios">
+          <label><input type="radio" name="gender" value="男">男</label>
+          <label><input type="radio" name="gender" value="女">女</label>
+        </div>
+      </div>
+      <div class="fld" data-f="birth"><span class="dbg-chip"></span><label>出生年月<span class="req">*</span></label><input type="text" placeholder="格式：2004-06"></div>
+      <div class="fld" data-f="idcard"><span class="dbg-chip"></span><label>身份证号<span class="req">*</span></label><input type="text" placeholder="用于背景调查，请如实填写"></div>
+      <div class="fld" data-f="politics"><span class="dbg-chip"></span><label>政治面貌<span class="req">*</span></label>
+        <select><option value="">请选择</option><option>中共党员</option><option>共青团员</option><option>群众</option></select></div>
+      <div class="fld" data-f="job"><span class="dbg-chip"></span><label>期望岗位<span class="req">*</span></label><input type="text" placeholder="如：后端开发工程师"></div>
+      <div class="fld" data-f="city"><span class="dbg-chip"></span><label>期望工作城市<span class="req">*</span></label>
+        <select><option value="">请选择</option><option>北京</option><option>上海</option><option>深圳</option><option>杭州</option><option>成都</option></select></div>
+      <div class="fld" data-f="degree"><span class="dbg-chip"></span><label>最高学历<span class="req">*</span></label>
+        <select><option value="">请选择</option><option>大专</option><option>本科</option><option>硕士</option><option>博士</option></select></div>
+    </div>
+
+    <div class="sec-title">教育经历<small>支持多段，脚本按序填充、绝不复用第一段</small></div>
+    <div class="edu-block"><span class="blk-tag">教育经历 ①</span>
+      <div class="grid3">
+        <div class="fld" data-f="school1"><span class="dbg-chip"></span><label>毕业院校<span class="req">*</span></label><input type="text" placeholder="请输入学校全称"></div>
+        <div class="fld" data-f="major1"><span class="dbg-chip"></span><label>专业<span class="req">*</span></label><input type="text" placeholder="请输入专业名称"></div>
+        <div class="fld" data-f="range1"><span class="dbg-chip"></span><label>在校时间<span class="req">*</span></label><input type="text" placeholder="如 2022.09-2026.06"></div>
+      </div>
+    </div>
+    <div class="edu-block"><span class="blk-tag">教育经历 ②</span>
+      <div class="grid3">
+        <div class="fld" data-f="school2"><span class="dbg-chip"></span><label>毕业院校<span class="req">*</span></label><input type="text" placeholder="无可填“无”"></div>
+        <div class="fld" data-f="major2"><span class="dbg-chip"></span><label>专业<span class="req">*</span></label><input type="text"></div>
+        <div class="fld" data-f="range2"><span class="dbg-chip"></span><label>在校时间<span class="req">*</span></label><input type="text"></div>
+      </div>
+    </div>
+
+    <div class="sec-title">开放问题</div>
+    <div class="fld" data-f="intro" style="margin-top:12px"><span class="dbg-chip"></span><label>自我介绍（300-600字）<span class="req">*</span></label>
+      <textarea placeholder="请从教育背景、项目/实习经历、个人优势等方面进行介绍…"></textarea></div>
+
+    <div class="form-foot">
+      <button class="submit" id="btnSubmit" type="button">提交申请</button>
+      <span class="note">提交前请确认所填信息真实、完整</span>
+    </div>
+    <div class="demo-flag">本页面为演示用模拟表单 · 数据不发送到任何服务器</div>
+  </div>
+</main>
+
+<!-- ===== 悬浮球 + 面板（脚本部分） ===== -->
+<button id="ball" type="button" aria-label="打开网申快填面板">AF<i></i></button>
+<button id="revive" type="button">AF-Fill 已在本站停用 · 点击恢复</button>
+
+<aside id="panel" class="hidden" aria-label="网申快填面板">
+  <div class="p-head">
+    <span class="wm">AF-FILL</span><span class="v">V0.1 DEMO</span>
+    <button class="close" id="btnClose" type="button" aria-label="收起面板">✕</button>
+  </div>
+  <nav class="tabs">
+    <button class="tab on" data-tab="fill" type="button">填充</button>
+    <button class="tab" data-tab="oq" type="button">开放题</button>
+    <button class="tab" data-tab="profile" type="button">Profile</button>
+    <button class="tab" data-tab="set" type="button">设置</button>
+  </nav>
+
+  <div class="p-body">
+    <!-- 填充 -->
+    <section class="pane on" data-pane="fill">
+      <div class="bar">
+        <select id="variantSel" aria-label="岗位变体">
+          <option value="default">变体 · 默认</option>
+          <option value="backend">变体 · 后端开发</option>
+          <option value="frontend">变体 · 前端开发</option>
+          <option value="management">变体 · 管理/协调岗</option>
+        </select>
+        <button class="btn pri" id="btnScan" type="button">扫描表单</button>
+      </div>
+      <div class="legend">
+        <span><i style="background:#4C9E7E"></i>高置信</span>
+        <span><i style="background:#D2A63C"></i>待确认</span>
+        <span><i style="background:#B4B5BB"></i>需人工</span>
+        <span><i style="background:#C6484E"></i>敏感默认跳过</span>
+      </div>
+      <div class="stats" id="stats" hidden></div>
+      <div class="rows" id="rows"></div>
+      <p class="hint" id="scanHint">尚未扫描。点「扫描表单」识别当前页面可填字段（只读操作，不会写入）。</p>
+    </section>
+
+    <!-- 开放题 -->
+    <section class="pane" data-pane="oq">
+      <div class="oq-detect"><i></i>本页检测到 1 个长文本框：自我介绍（300-600字）</div>
+      <div id="tplList"></div>
+      <p class="hint">模板存于 Profile；<b style="font-family:var(--mono);font-size:10px">{{company}}</b> 等占位符按「设置」里的上下文替换，替换不了的会原样保留并标黄提醒，绝不静默留空。</p>
+    </section>
+
+    <!-- Profile -->
+    <section class="pane" data-pane="profile">
+      <p class="hint" style="margin:0 0 9px">数据只存在你本机：导入后存入 Tampermonkey 存储（跨网站共享），源文件 <b style="font-family:var(--mono);font-size:10px">profile.json</b> 由你自行维护。</p>
+      <div class="profile-view" id="profileView"></div>
+      <label class="hint" style="margin:0 0 5px;display:block">或粘贴 JSON 导入：</label>
+      <textarea class="imp-area" id="impArea" placeholder='{"schemaVersion":1, "base":{...}}'></textarea>
+      <div class="imp-msg" id="impMsg"></div>
+      <div class="oprow">
+        <button class="btn pri" id="btnImp" type="button">校验并导入</button>
+        <button class="btn ghost" id="btnExp" type="button">复制导出</button>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="pane" data-pane="set">
+      <div class="set-row">
+        <div class="sl">本站启用<small>关闭后此域名不再显示悬浮球</small></div>
+        <button class="sw on" id="swSite" type="button" role="switch" aria-checked="true" aria-label="本站启用"></button>
+      </div>
+      <div class="set-row" style="display:block;border-bottom:none">
+        <div class="sl">占位符上下文<small>填充 / 插入模板时替换 {{company}}、{{position}}。留空则保留原样并标黄。</small></div>
+        <input class="set-input" id="ctxCompany" placeholder="公司名，如：启明信息技术（可从页面标题自动建议）">
+        <input class="set-input" id="ctxPosition" placeholder="岗位名，如：研发工程师" style="margin-bottom:2px">
+      </div>
+      <div class="set-row">
+        <div class="sl">Debug 模式<small>在页面上标出所有被识别的控件与标签，用于开发适配器</small></div>
+        <button class="sw" id="swDebug" type="button" role="switch" aria-checked="false" aria-label="Debug 模式"></button>
+      </div>
+    </section>
+  </div>
+
+  <div class="p-foot">
+    <div class="done-banner" id="doneBanner">✓ 已填充 <b id="doneCount">0</b> 项，跳过 <b id="skipCount">0</b> 项。<br>请逐项核对后再自行提交——脚本不会、也不会替你点击提交。</div>
+    <button class="fillbtn" id="btnFill" type="button" disabled>执行填充 · 仅勾选项<span class="fine">FILL CHECKED ONLY — REVIEW BEFORE SUBMIT</span></button>
+  </div>
+</aside>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ================================================================
+   网申快填 AF-Fill · 效果演示（Phase 0 + 0b）
+   本文件模拟：①一个典型网申表单页 ②脚本悬浮球与面板的完整交互
+   ================================================================ */
+'use strict';
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- 演示用 Profile（正式版从 profile.json 导入） ---------- */
+const PROFILE = {
+  schemaVersion: 1,
+  base: {
+    basic: {
+      name:'李雷', phone:'13800138000', email:'lilei@example.com', gender:'男',
+      birthDate:'2002-03', idCard:'', politicalStatus:'群众', github:'github.com/example-dev'
+    },
+    education: [{
+      school:'示例工业大学', major:'软件工程', degree:'本科',
+      startDate:'2022-09', endDate:'2026-06', range:'2022.09-2026.06'
+    }],
+    openQuestions: [
+      { type:'selfIntro', tags:['通用'], title:'自我介绍 · 600字',
+        content:'面试官您好，我是{{name}}，示例工业大学软件工程专业2026届本科生。在校期间我完成了校园二手交易平台、分布式网盘与数据可视化毕业设计三个项目，具备从需求拆解到落地的完整闭环能力；先后在示例软件科技与示例教育科技完成后端、前端方向实习。我学习能力强、执行力高，期待加入{{company}}，把技术做成实际价值。' },
+      { type:'whyUs', tags:['技术岗'], title:'为什么选择 {{company}} · 技术岗版',
+        content:'我关注到{{company}}在核心业务上的技术投入，以及对应届生工程能力的培养体系。我在校期间围绕 Web 开发与数据系统做过完整项目，实习中参与过实际业务模块的开发与优化，希望能把已有的工程习惯带到{{company}}的团队里，从可交付的小模块做起。' },
+      { type:'career', tags:['通用'], title:'职业规划 · 三年',
+        content:'第一年快速吃透{{position}}相关的业务与技术栈，成为可独立交付的稳定力量；第二年在一到两个核心模块上形成自己的深度；第三年希望能带小范围的技术改进，向更全面的工程师成长。' }
+    ]
+  },
+  variants: {
+    backend:    { label:'后端开发',  overrides:{ basic:{ job:'后端开发工程师' },
+      selfIntro:'面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为后端开发。我熟悉 Java 与 Spring Boot/MyBatis，理解 HTTP 协议与 REST 接口设计，熟悉 PostgreSQL/MySQL 并有调优实践；在示例软件科技实习期间参与工单系统后端开发与并发问题修复。希望能加入{{company}}，用扎实的后端能力支撑业务稳定增长。' }},
+    frontend:   { label:'前端开发',  overrides:{ basic:{ job:'前端开发工程师' },
+      selfIntro:'面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为前端开发。我掌握 HTML5/CSS3/JavaScript（ES6+）与 React，接触过 Vue 与工程化构建；在示例教育科技实习期间参与在线学习平台前端开发，完成核心页面与组件抽离。期待在{{company}}打磨高质量的前端产品。' }},
+    management: { label:'管理/协调岗', overrides:{ basic:{ job:'项目管理/运营协调' },
+      selfIntro:'面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为管理与协调类岗位。我先后参与两个校企合作项目，在跨职能团队中承担需求对接、进度协同与交付把关；在项目中负责拆解任务、跟进风险与验收，让交付节奏可控。我沟通顺畅、以结果为导向，期待在{{company}}把团队效能做成可度量的增长。' }}
+  }
+};
+/* 变体覆盖 selfIntro 的路径合并（演示用简化版 deepMerge） */
+function merged(variant){
+  const v = PROFILE.variants[variant];
+  const m = JSON.parse(JSON.stringify(PROFILE.base));
+  if(!v) return m;
+  for(const k in v.overrides){
+    if(typeof v.overrides[k]==='object' && !Array.isArray(v.overrides[k]) && typeof m[k]==='object')
+      Object.assign(m[k], v.overrides[k]);
+    else m[k] = v.overrides[k];
+  }
+  return m;
+}
+function resolve(t){
+  return String(t||'')
+    .replace(/\{\{company\}\}/g, ctx.company || '{{company}}')
+    .replace(/\{\{position\}\}/g, ctx.position || '{{position}}')
+    .replace(/\{\{name\}\}/g, PROFILE.base.basic.name);
+}
+
+/* ---------- 状态 ---------- */
+let ctx = { company:'', position:'' };
+let variant = 'default';
+let scanned = false, filling = false;
+let ROWS = [];          // {id,label,conf,kind,value,checked,el,note,filled}
+const form = f => $('[data-f="'+f+'"]');
+
+/* ---------- 扫描行定义（正式版由引擎实时识别生成，此处为同一份数据的手工模拟） ---------- */
+function buildRows(){
+  const P = merged(variant), B = P.basic;
+  const intro = P.selfIntro || P.openQuestions[0].content;
+  return [
+    { label:'姓名',            conf:'high', kind:'text',   f:'name',    value:B.name },
+    { label:'手机号',          conf:'high', kind:'text',   f:'phone',   value:B.phone },
+    { label:'电子邮箱',        conf:'high', kind:'text',   f:'email',   value:B.email },
+    { label:'性别',            conf:'high', kind:'radio',  f:'gender',  value:B.gender },
+    { label:'出生年月',        conf:'mid',  kind:'text',   f:'birth',   value:B.birthDate,
+      note:'格式待确认：页面可能要求 2004.06 / 200406' },
+    { label:'身份证号',        conf:'sen',  kind:'text',   f:'idcard',  value:B.idCard,
+      checked:false, note:'敏感字段 · Profile 中为空，请人工填写' },
+    { label:'政治面貌',        conf:'low',  kind:'select', f:'politics', value:B.politicalStatus,
+      note:'Profile 未填写 · 需人工选择' },
+    { label:'期望岗位',        conf:'high', kind:'text',   f:'job',     value:B.job },
+    { label:'期望工作城市',    conf:'high', kind:'select', f:'city',    value:'北京' },
+    { label:'最高学历',        conf:'high', kind:'select', f:'degree',  value:P.education[0].degree },
+    { label:'教育①·毕业院校', conf:'high', kind:'text',   f:'school1', value:P.education[0].school },
+    { label:'教育①·专业',     conf:'high', kind:'text',   f:'major1',  value:P.education[0].major },
+    { label:'教育①·在校时间', conf:'high', kind:'text',   f:'range1',  value:P.education[0].range },
+    { label:'教育②·毕业院校', conf:'low',  kind:'text',   f:'school2', value:'',
+      note:'Profile 无第 2 段教育经历 · 不复用第①段' },
+    { label:'教育②·专业',     conf:'low',  kind:'text',   f:'major2',  value:'', note:'同上' },
+    { label:'教育②·在校时间', conf:'low',  kind:'text',   f:'range2',  value:'', note:'同上' },
+    { label:'自我介绍',        conf:'high', kind:'textarea', f:'intro', value:intro, long:true },
+  ];
+}
+
+/* ---------- 渲染扫描结果 ---------- */
+function renderRows(){
+  const wrap = $('#rows'); wrap.innerHTML = '';
+  const order = { high:0, mid:1, sen:2, low:3 };
+  ROWS.sort((a,b)=>order[a.conf]-order[b.conf]);
+  ROWS.forEach((r,i)=>{
+    const el = document.createElement('div');
+    el.className = 'row c-'+r.conf;
+    el.style.animationDelay = (RM?0:i*0.035)+'s';
+    const editable = r.conf!=='low';
+    const checked = r.conf==='high' || r.conf==='mid';
+    el.innerHTML =
+      '<span class="dot"></span><span class="lb" title="'+r.label+'">'+r.label+'</span>' +
+      '<input class="val" '+(editable?'':'disabled ')+'value="">' +
+      (r.conf==='low' ? '<button class="loc" type="button">定位</button>' : '') +
+      '<input type="checkbox" class="ck" aria-label="填充 '+r.label+'">';
+    const val = $('.val', el);
+    val.value = r.value ? (r.long && r.value.length>26 ? r.value.slice(0,26)+'…' : r.value) : '—';
+    if(r.long){ val.title = r.value; }
+    if(editable){
+      val.addEventListener('input', ()=>{ r.value = val.value; });
+    }
+    const ck = $('.ck', el);
+    ck.checked = checked;
+    if(!editable) ck.disabled = true;
+    ck.addEventListener('change', ()=>{ r.checked = ck.checked; });
+    if(r.conf==='low'){
+      $('.loc', el).addEventListener('click', ()=>{
+        const t = form(r.f); t.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});
+        t.classList.remove('flashY'); void t.offsetWidth; t.classList.add('flashY');
+        setTimeout(()=>t.classList.remove('flashY'), 2000);
+      });
+    }
+    wrap.appendChild(el);
+    r.el = el; r.checked = checked && editable;
+  });
+  /* 备注行 */
+  ROWS.forEach(r=>{
+    if(!r.note) return;
+    const n = document.createElement('div');
+    n.className = 'rownote';
+    n.textContent = (r.conf==='sen'?'⚠ ':'· ') + r.note;
+    r.el.after(n);
+  });
+  /* 统计（mono 微标签行） */
+  const c = k => ROWS.filter(r=>r.conf===k).length;
+  $('#stats').hidden = false;
+  $('#stats').innerHTML =
+    '<span class="chip"><i style="background:#4C9E7E"></i>高 <b>'+c('high')+'</b></span>'+
+    '<span class="chip"><i style="background:#D2A63C"></i>待确认 <b>'+c('mid')+'</b></span>'+
+    '<span class="chip"><i style="background:#B4B5BB"></i>需人工 <b>'+c('low')+'</b></span>'+
+    '<span class="chip"><i style="background:#C6484E"></i>敏感 <b>'+c('sen')+'</b></span>';
+  $('#scanHint').style.display = 'none';
+  $('#btnFill').disabled = false;
+  $('#doneBanner').classList.remove('on');
+}
+
+/* ---------- 填充 ---------- */
+function typeInto(el, text, done){
+  if(RM){ el.value = text; return done(); }
+  let i = 0; el.focus();
+  const iv = setInterval(()=>{
+    i += 2; el.value = text.slice(0, i);
+    if(i >= text.length){ clearInterval(iv); el.blur(); done(); }
+  }, 9);
+}
+function flash(f, cls){
+  const t = form(f); t.classList.remove('flashV','flashY'); void t.offsetWidth;
+  t.classList.add(cls); setTimeout(()=>t.classList.remove(cls), 2000);
+}
+function fillOne(r, done){
+  const t = form(r.f);
+  const mark = bad => { r.el.classList.add('done'); if(bad) r.el.classList.add('warnfill');
+    r.el.querySelector('.ck').disabled = true; flash(r.f, bad?'flashY':'flashV'); };
+  if(r.kind==='text'){ typeInto(t.querySelector('input'), r.value, ()=>{ mark(false); done(); }); }
+  else if(r.kind==='textarea'){ typeInto(t.querySelector('textarea'), r.value, ()=>{ mark(false); done(); }); }
+  else if(r.kind==='select'){
+    const sel = t.querySelector('select');
+    const opt = [...sel.options].find(o=>o.value===r.value || o.text===r.value)
+             || [...sel.options].find(o=>o.text.includes(r.value));
+    if(opt){ sel.value = opt.value; sel.dispatchEvent(new Event('change')); mark(false); }
+    else { mark(true); r.note = '未匹配到选项：'+r.value; }
+    done();
+  }
+  else if(r.kind==='radio'){
+    const radio = $$('input[type=radio][name=gender]').find(x=>x.value===r.value);
+    if(radio){ radio.click(); mark(false); } else mark(true);
+    done();
+  }
+}
+function doFill(){
+  if(filling) return;
+  const targets = ROWS.filter(r=>r.checked && r.conf!=='low' && r.value);
+  if(!targets.length){ toast('没有已勾选的可填项', 'warn'); return; }
+  filling = true; $('#btnFill').disabled = true;
+  targets.forEach((r,i)=> setTimeout(()=>{
+    fillOne(r, ()=>{
+      if(i === targets.length-1){
+        filling = false; $('#btnFill').disabled = false;
+        $('#doneCount').textContent = targets.length;
+        $('#skipCount').textContent = ROWS.filter(r=>r.conf==='low' || (r.conf==='sen' && !r.checked)).length;
+        $('#doneBanner').classList.add('on');
+        /* 占位符未解析 → 标黄 */
+        ROWS.forEach(r=>{
+          if(r.filled) return;
+          if(r.kind!=='select' && r.kind!=='radio' && /\{\{\w+\}\}/.test(r.value)){
+            r.el.classList.add('warnfill');
+            const n = document.createElement('div');
+            n.className = 'rownote'; n.style.color = '#B98F35';
+            n.textContent = '⚠ 含未解析占位符，请到「设置」补公司名后重填';
+            r.el.after(n);
+          }
+        });
+        toast('填充完成，请逐项核对后自行提交（演示页不会提交）');
+      }
+    });
+  }, RM ? 0 : i*110));
+}
+
+/* ---------- 开放题模板 ---------- */
+function renderTpls(){
+  const list = $('#tplList'); list.innerHTML = '';
+  PROFILE.base.openQuestions.forEach((t,i)=>{
+    const card = document.createElement('div');
+    card.className = 'oq-card';
+    const pv = resolve(t.content);
+    card.innerHTML =
+      '<div class="tt"><b>'+t.title.replace(/\{\{company\}\}/g, ctx.company||'{{company}}')+'</b>'+
+      '<span class="ty">'+t.type.toUpperCase()+' · '+t.tags.join('/')+'</span></div>'+
+      '<div class="pv">'+ pv.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/\{\{(\w+)\}\}/g,'<b>{{$1}}</b>') +'</div>'+
+      '<div class="ops"><button class="btn pri" type="button">插入到自我介绍</button>'+
+      '<button class="btn ghost" type="button">复制</button></div>';
+    $('[class*=pri]', card).addEventListener('click', ()=>{
+      const ta = form('intro').querySelector('textarea');
+      typeInto(ta, pv, ()=>{
+        flash('intro','flashV');
+        if(/\{\{\w+\}\}/.test(pv)) toast('已插入，但含未解析占位符（黄色部分请手动替换）','warn');
+        else toast('已插入自我介绍框');
+      });
+    });
+    $('.ghost', card).addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(pv); toast('模板已复制到剪贴板'); }
+      catch(e){ toast('复制失败：浏览器未授权剪贴板','bad'); }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- Profile 视图 / 导入导出 ---------- */
+function showProfile(){
+  $('#profileView').textContent = JSON.stringify(PROFILE, null, 2);
+}
+$('#btnImp').addEventListener('click', ()=>{
+  const msg = $('#impMsg'), raw = $('#impArea').value.trim();
+  msg.className = 'imp-msg';
+  if(!raw){ msg.classList.add('err'); msg.textContent = '请先粘贴 JSON 内容'; return; }
+  try{
+    const j = JSON.parse(raw);
+    if(j.schemaVersion!==1 || !j.base || !j.base.basic || !j.base.basic.name)
+      throw new Error('缺少 schemaVersion=1 或 base.basic.name');
+    msg.classList.add('ok');
+    msg.textContent = '✓ 校验通过，已存入 Tampermonkey 存储（演示模拟；正式版跨网站共享）';
+    toast('Profile 导入成功');
+  }catch(e){
+    msg.classList.add('err');
+    msg.textContent = '解析失败：'+e.message;
+  }
+});
+$('#btnExp').addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(JSON.stringify(PROFILE, null, 2)); toast('已复制当前 Profile'); }
+  catch(e){ toast('复制失败：浏览器未授权剪贴板','bad'); }
+});
+
+/* ---------- 设置 ---------- */
+function bindSwitch(id, init, cb){
+  const el = $(id); let on = init;
+  el.classList.toggle('on', on); el.setAttribute('aria-checked', on);
+  el.addEventListener('click', ()=>{
+    on = !on; el.classList.toggle('on', on); el.setAttribute('aria-checked', on); cb(on);
+  });
+}
+bindSwitch('#swSite', true, on=>{
+  if(on){ $('#ball').style.display=''; $('#revive').classList.remove('on'); toast('已在本站启用'); }
+  else{
+    $('#ball').style.display='none'; $('#panel').classList.add('hidden');
+    $('#revive').classList.add('on'); toast('已在本站停用（演示可点右下角恢复）');
+  }
+});
+$('#revive').addEventListener('click', ()=>{
+  $('#swSite').click();
+});
+bindSwitch('#swDebug', false, on=>{
+  document.body.classList.toggle('debug', on);
+  $$('.fld').forEach(f=>{
+    const chip = $('.dbg-chip', f);
+    if(chip) chip.textContent = 'label: '+(f.dataset.f||'');
+  });
+  toast(on ? 'Debug 开：页面已标注识别结果' : 'Debug 关');
+});
+$('#ctxCompany').addEventListener('input', e=>{
+  ctx.company = e.target.value.trim(); renderTpls();
+});
+$('#ctxPosition').addEventListener('input', e=>{ ctx.position = e.target.value.trim(); renderTpls(); });
+
+/* ---------- 面板开合 / Tab / 变体 ---------- */
+function togglePanel(force){
+  const p = $('#panel');
+  const open = force!==undefined ? force : p.classList.contains('hidden');
+  p.classList.toggle('hidden', !open);
+}
+$('#btnClose').addEventListener('click', ()=>togglePanel(false));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') togglePanel(false); });
+
+/* 悬浮球拖拽（移动阈值 6px 内视为点击） */
+(()=>{
+  const ball = $('#ball'); let sx,sy,ox,oy,drag=false,wasDrag=false;
+  try{ const p = JSON.parse(localStorage.getItem('afBallPos')||'null');
+       if(p){ ball.style.right='auto'; ball.style.bottom='auto'; ball.style.left=p.x+'px'; ball.style.top=p.y+'px'; } }catch(e){}
+  ball.addEventListener('pointerdown', e=>{
+    drag=false; sx=e.clientX; sy=e.clientY;
+    const r = ball.getBoundingClientRect(); ox=r.left; oy=r.top;
+    ball.setPointerCapture(e.pointerId);
+  });
+  ball.addEventListener('pointermove', e=>{
+    if(e.buttons!==1) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(Math.abs(dx)+Math.abs(dy)>6) drag=true;
+    if(!drag) return;
+    const x = Math.min(Math.max(0, ox+dx), innerWidth-56);
+    const y = Math.min(Math.max(0, oy+dy), innerHeight-56);
+    ball.style.right='auto'; ball.style.bottom='auto'; ball.style.left=x+'px'; ball.style.top=y+'px';
+  });
+  ball.addEventListener('pointerup', ()=>{
+    if(drag){ wasDrag = true; try{ const r=ball.getBoundingClientRect();
+      localStorage.setItem('afBallPos', JSON.stringify({x:r.left,y:r.top})); }catch(e){} }
+  });
+  /* click 只在非拖拽时开合面板（键盘 Enter/Space 也会走到这里） */
+  ball.addEventListener('click', ()=>{
+    if(wasDrag){ wasDrag = false; return; }
+    togglePanel();
+  });
+})();
+
+function switchTab(name){
+  $$('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===name));
+  $$('.pane').forEach(p=>p.classList.toggle('on', p.dataset.pane===name));
+}
+$$('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab)));
+
+$('#variantSel').addEventListener('change', e=>{
+  variant = e.target.value;
+  if(scanned){ ROWS = buildRows(); renderRows(); toast('已按「'+PROFILE.variants[variant].label+'」变体刷新将填值'); }
+  renderTpls();
+});
+
+/* ---------- 模拟表单的提交按钮 ---------- */
+$('#injectedPill').addEventListener('click', ()=>{ togglePanel(true); switchTab('fill'); });
+$('#btnSubmit').addEventListener('click', ()=>{
+  toast('这是演示页 · 正式脚本同样绝不会替你点提交——请自己核对后手动提交', 'warn');
+});
+
+/* ---------- 扫描 / 填充 / 重置 ---------- */
+$('#btnScan').addEventListener('click', ()=>{
+  scanned = true; ROWS = buildRows(); renderRows(); renderTpls();
+  toast('扫描完成：识别 17 个控件，无写入操作');
+});
+$('#btnFill').addEventListener('click', doFill);
+$('#btnReset').addEventListener('click', ()=>{
+  $$('.ats input[type=text]').forEach(i=>i.value='');
+  $$('.ats textarea').forEach(t=>t.value='');
+  $$('.ats select').forEach(s=>s.value='');
+  $$('.ats input[type=radio]').forEach(r=>r.checked=false);
+  ROWS = []; scanned = false;
+  $('#rows').innerHTML=''; $('#stats').hidden = true;
+  $('#scanHint').style.display=''; $('#btnFill').disabled = true;
+  $('#doneBanner').classList.remove('on');
+  toast('演示已重置');
+});
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, kind){
+  const t = $('#toast'); t.textContent = msg;
+  t.className = 'on' + (kind ? ' '+kind : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('on'), 2800);
+}
+
+/* ---------- 初始渲染 ---------- */
+renderTpls(); showProfile();
+</script>
+</body>
+</html>

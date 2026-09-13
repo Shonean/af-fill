@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>启航人才网 · 通用网申系统（Phase 1 验证页）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#EDEEF1;color:#26282E}
+.top{background:#fff;border-bottom:1px solid rgba(20,20,22,.1);padding:14px 22px;display:flex;gap:14px;align-items:baseline}
+.top b{font-size:15px}
+.top span{font-size:12px;color:#83858D}
+.tip{max-width:860px;margin:16px auto 0;padding:10px 16px;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:10px;font-size:12px;color:#7A6420}
+.ats{max-width:860px;margin:18px auto 80px;padding:0 16px}
+.card{background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:26px 30px 30px;margin-bottom:18px}
+h2{font-size:14.5px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+h2::before{content:"";width:3px;height:14px;background:#5B6B7E;border-radius:1px}
+h2 small{font-weight:400;font-size:11px;color:#9A9CA3}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;margin-top:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 20px;margin-top:14px}
+.f label{display:block;font-size:12px;color:#5A5C64;margin-bottom:5px}
+.f label .r{color:#C6484E;margin-left:2px}
+.f input,.f select,.f textarea{width:100%;font:13.5px/1.5 inherit;color:inherit;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:8px;padding:8px 11px}
+.f textarea{min-height:110px;resize:vertical;line-height:1.7}
+table.edu{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+table.edu th{font-weight:400;color:#5A5C64;font-size:12px;text-align:left;padding:6px 8px;border-bottom:1px solid rgba(20,20,22,.1)}
+table.edu td{padding:7px 8px;border-bottom:1px solid rgba(20,20,22,.06)}
+table.edu input{width:100%;font:13px/1.5 inherit;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:7px;padding:7px 10px}
+fieldset{border:1px dashed rgba(20,20,22,.14);border-radius:10px;padding:12px 14px;margin-top:14px}
+legend{font-size:12px;color:#5A5C64;padding:0 8px}
+.radios{display:flex;gap:18px;padding:4px 0}
+.radios label,.ckline{display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
+.ckgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px 14px;margin-top:10px}
+.prev-line{display:flex;align-items:center;gap:10px;margin-top:14px}
+.prev-line>span{font-size:12px;color:#5A5C64;white-space:nowrap}
+.prev-line input{flex:1;font:13.5px/1.5 inherit;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:8px;padding:8px 11px}
+.foot{display:flex;align-items:center;gap:14px;margin-top:8px}
+.submit{background:#5B6B7E;color:#fff;border:none;border-radius:9px;padding:10px 34px;font-size:13.5px;font-weight:500}
+.note{font-size:12px;color:#9A9CA3}
+</style>
+</head>
+<body>
+<div class="top"><b>启航人才网</b><span>2026 届校园招聘 · 通用网申系统 · Phase 1 引擎验证页</span></div>
+<div class="tip">本页用于验证 AF-Fill 通用引擎：故意混用 7 种标签写法（label[for] / 包裹 label / aria-label / 表格布局 / 前置兄弟 / placeholder / 纯英文 name/id）、3 段教育 + 3 段项目 + 2 段实习平铺重复组、select / radio / checkbox 多选 / date / file。<b>v0.2.3 回归字段：</b>「姓　名」含全角空格 U+3000（应高分命中姓名）、籍贯省/市/区三级原生 select 级联（应逐级填满）、婚姻状况 select。Profile 只有 1 段教育 → 第②③段应置灰提示「缺失」。<b>本页直接内载了脚本本体（无需 Tampermonkey）</b>：右下角出现白瓷球即引擎已运行；在「附件简历」里任选一个文件 → 自动扫描并填充。</div>
+
+<main class="ats">
+  <div class="card">
+    <h2>基本信息 <small>label[for] · 包裹 label · aria-label · 前置兄弟 · placeholder · 英文 name</small></h2>
+    <div class="grid">
+      <div class="f"><label for="f-name">姓　名<span class="r">*</span></label><input id="f-name" type="text" placeholder="请输入真实姓名"></div>
+      <div class="f"><label for="f-phone">手机号<span class="r">*</span></label><input id="f-phone" type="tel" maxlength="11" placeholder="11位手机号"></div>
+      <div class="f"><label>电子邮箱<span class="r">*</span><input type="email" name="mail_addr" style="display:block;margin-top:5px"></label></div>
+      <div class="f">
+        <fieldset style="margin-top:0"><legend>性别<span class="r">*</span></legend>
+          <div class="radios">
+            <label><input type="radio" name="gender" value="男">男</label>
+            <label><input type="radio" name="gender" value="女">女</label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="f"><label for="f-birth-d">出生日期<span class="r">*</span></label><input id="f-birth-d" type="date"></div>
+      <div class="f"><label for="f-birth-t">出生年月</label><input id="f-birth-t" type="text" placeholder="格式：2004.06" maxlength="7"></div>
+      <div class="f"><label for="f-idc">身份证号<span class="r">*</span></label><input id="f-idc" type="text" placeholder="用于背景调查"></div>
+      <div class="f"><label for="f-pol">政治面貌</label>
+        <select id="f-pol"><option value="">请选择</option><option>中共党员</option><option>共青团员</option><option>群众</option></select></div>
+      <div class="f"><label for="f-nation">民族</label>
+        <select id="f-nation"><option value="">请选择</option><option>汉族</option><option>回族</option><option>满族</option><option>其他</option></select></div>
+      <div class="f"><label>籍贯（省）<select id="f-hp" style="display:block;margin-top:5px"></select></label></div>
+      <div class="f"><label>籍贯（市）<select id="f-hc" style="display:block;margin-top:5px"><option value="">请选择市</option></select></label></div>
+      <div class="f"><label>籍贯（区）<select id="f-hd" style="display:block;margin-top:5px"><option value="">请选择区</option></select></label></div>
+      <div class="f"><label for="f-mar">婚姻状况</label>
+        <select id="f-mar"><option value="">请选择</option><option>未婚</option><option>已婚</option><option>保密</option></select></div>
+      <div class="f"><label for="f-addr">现居住地<span class="r">*</span></label><input id="f-addr" type="text" placeholder="如：江苏南京"></div>
+      <div class="prev-line"><span>户口所在地：</span><input type="text" name="hukou_addr" placeholder="与身份证一致可不填"></div>
+      <div class="f"><label for="f-city">期望工作城市<span class="r">*</span></label>
+        <select id="f-city"><option value="">请选择</option><option>北京</option><option>上海</option><option>深圳</option><option>杭州</option><option>成都</option><option>南京</option><option>苏州</option></select></div>
+      <div class="f"><label for="f-salary">期望月薪</label>
+        <select id="f-salary"><option value="">请选择</option><option>8k以下</option><option>8k-12k</option><option>12k-16k</option><option>16k-20k</option><option>20k以上</option></select></div>
+      <div class="f"><input type="text" name="apply_job" aria-label="应聘岗位" placeholder="如：后端开发工程师"></div>
+      <div class="f"><input type="text" aria-label="微信号" placeholder="WeChat ID"></div>
+      <div class="f"><input id="f-qq" type="text" placeholder="QQ号码"></div>
+      <div class="f"><label for="f-gh">GitHub 主页</label><input id="f-gh" type="text" placeholder="github.com/…"></div>
+      <div class="f"><label for="f-eng">英语水平</label>
+        <select id="f-eng"><option value="">请选择</option><option>CET-4</option><option>CET-6</option><option>TEM-8</option><option>雅思/托福</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>教育经历 <small>表格布局（tr/td 标签）· 平铺重复组：Profile 仅 1 段 → ②③置灰</small></h2>
+    <table class="edu">
+      <tr><th>毕业院校</th><th>专业</th><th>学历</th><th>在校时间</th></tr>
+      <tr>
+        <td><input type="text" name="edu1_school" placeholder="学校全称"></td>
+        <td><input type="text" name="edu1_major"></td>
+        <td><input type="text" name="edu1_degree" placeholder="本科/硕士"></td>
+        <td><input type="text" name="edu1_range" placeholder="如 2022.09-2026.06"></td>
+      </tr>
+      <tr>
+        <td><input type="text" name="edu2_school" placeholder="无可不填"></td>
+        <td><input type="text" name="edu2_major"></td>
+        <td><input type="text" name="edu2_degree"></td>
+        <td><input type="text" name="edu2_range"></td>
+      </tr>
+      <tr>
+        <td><input type="text" name="edu3_school"></td>
+        <td><input type="text" name="edu3_major"></td>
+        <td><input type="text" name="edu3_degree"></td>
+        <td><input type="text" name="edu3_range"></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>实习经历 <small>标签带序号（实习单位① / 实习单位2）· Profile 2 段</small></h2>
+    <div class="grid">
+      <div class="f"><label for="i1-co">实习单位①</label><input id="i1-co" type="text"></div>
+      <div class="f"><label for="i1-po">实习岗位①</label><input id="i1-po" type="text"></div>
+      <div class="f"><label for="i1-ra">实习时间①</label><input id="i1-ra" type="text" placeholder="如 2026.03-2026.04"></div>
+      <div class="f" style="grid-column:1/-1"><label for="i1-de">实习内容①</label><textarea id="i1-de"></textarea></div>
+      <div class="f"><label for="i2-co">实习单位2</label><input id="i2-co" type="text"></div>
+      <div class="f"><label for="i2-po">实习岗位2</label><input id="i2-po" type="text"></div>
+      <div class="f"><label for="i2-ra">实习时间2</label><input id="i2-ra" type="text"></div>
+      <div class="f" style="grid-column:1/-1"><label for="i2-de">实习内容2</label><textarea id="i2-de"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>项目经历 <small>3 段平铺 · 描述为 textarea</small></h2>
+    <div class="grid">
+      <div class="f"><label for="p1-na">项目名称①</label><input id="p1-na" type="text"></div>
+      <div class="f"><label for="p1-ro">项目角色①</label><input id="p1-ro" type="text"></div>
+      <div class="f"><label for="p1-ra">项目时间①</label><input id="p1-ra" type="text"></div>
+      <div class="f" style="grid-column:1/-1"><label for="p1-de">项目描述①</label><textarea id="p1-de"></textarea></div>
+      <div class="f"><label for="p2-na">项目名称2</label><input id="p2-na" type="text"></div>
+      <div class="f"><label for="p2-ro">项目角色2</label><input id="p2-ro" type="text"></div>
+      <div class="f"><label for="p2-ra">项目时间2</label><input id="p2-ra" type="text"></div>
+      <div class="f" style="grid-column:1/-1"><label for="p2-de">项目描述2</label><textarea id="p2-de"></textarea></div>
+      <div class="f"><label for="p3-na">项目名称3</label><input id="p3-na" type="text"></div>
+      <div class="f" style="grid-column:2/-1"><label for="p3-li">项目链接3</label><input id="p3-li" type="text" placeholder="github.com/…"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>技能与自我介绍</h2>
+    <div class="grid" style="margin-top:8px">
+      <div style="grid-column:1/-1">
+        <label style="font-size:12px;color:#5A5C64">专业技能（多选）</label>
+        <div class="ckgrid">
+          <label class="ckline"><input type="checkbox" name="skills" value="Java">Java</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="Python">Python</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="Spring Boot">Spring Boot</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="MyBatis">MyBatis</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="React">React</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="Vue">Vue</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="PostgreSQL">PostgreSQL</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="Git">Git</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="Linux">Linux</label>
+          <label class="ckline"><input type="checkbox" name="skills" value="OpenGL">OpenGL</label>
+        </div>
+      </div>
+      <div class="f" style="grid-column:1/-1"><label for="f-intro">自我介绍<span class="r">*</span></label><textarea id="f-intro" placeholder="300-600字"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>附件与声明 <small>脚本应把附件列为「需人工上传」，协议勾选框永不自动勾选</small></h2>
+    <div class="grid">
+      <div class="f"><label for="f-cv">附件简历</label><input id="f-cv" type="file"></div>
+      <div class="f" style="grid-column:1/-1">
+        <label class="ckline" style="margin-top:6px"><input type="checkbox" name="agree" value="1">我已阅读并同意《隐私政策》与《招聘声明》</label>
+      </div>
+    </div>
+    <div class="foot" style="margin-top:18px">
+      <button class="submit" type="button">提交申请</button>
+      <span class="note">AF-Fill 永远不会点击这个按钮 —— 请核对后自己提交</span>
+    </div>
+  </div>
+</main>
+<!-- 籍贯三级级联数据：省 change → 载入市；市 change → 载入区（模拟原生级联） -->
+<script>
+(function () {
+  var DATA = {
+    '江苏省': { '南京市': ['玄武区', '秦淮区'], '苏州市': ['姑苏区', '吴中区'] },
+    '北京市': { '北京市': ['东城区', '西城区', '海淀区'] },
+    '山东省': { '济南市': ['历下区', '市中区', '历城区'], '青岛市': ['市南区', '崂山区', '城阳区'] },
+    '广东省': { '广州市': ['天河区', '越秀区'], '深圳市': ['南山区', '福田区'] }
+  };
+  var p = document.getElementById('f-hp'), c = document.getElementById('f-hc'), d = document.getElementById('f-hd');
+  function fill(sel, arr, ph) {
+    sel.innerHTML = '<option value="">' + ph + '</option>' + arr.map(function (x) { return '<option>' + x + '</option>'; }).join('');
+  }
+  fill(p, Object.keys(DATA), '请选择省');
+  fill(c, [], '请选择市');
+  fill(d, [], '请选择区');
+  p.addEventListener('change', function () {
+    var m = DATA[p.value] || {};
+    fill(c, Object.keys(m), '请选择市');
+    fill(d, [], '请选择区');
+  });
+  c.addEventListener('change', function () {
+    fill(d, (DATA[p.value] || {})[c.value] || [], '请选择区');
+  });
+})();
+</script>
+<!-- AF-Fill 测试直载：脚本作为普通页面脚本运行（无 GM API 时自动回退 localStorage）。
+     已装 Tampermonkey 时脚本内有 #af-host 双实例保护，不会出现两个球。 -->
+<script src="../autofill.user.js"></script>
+</body>
+</html>

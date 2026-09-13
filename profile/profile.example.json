@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-01-01",
+  "_说明": "测试/示例档案（虚构人物「李雷」）。字段结构与 profile.json 完全一致：日期 YYYY-MM，*Full 为含日完整日期，起止统一 'YYYY.MM-YYYY.MM'。真实档案请另存为 profile/profile.json（已 gitignore），或直接在面板 Profile Tab 导入。",
+  "base": {
+    "basic": {
+      "name": "李雷",
+      "idType": "身份证",
+      "idCard": "110101200203150011",
+      "phone": "13800138000",
+      "email": "lilei@example.com",
+      "gender": "男",
+      "birthDate": "2002-03",
+      "birthDateFull": "2002-03-15",
+      "nation": "汉族",
+      "politicalStatus": "群众",
+      "maritalStatus": "未婚",
+      "health": "健康",
+      "hometown": "江苏省南京市玄武区",
+      "gaokaoSource": "江苏省南京市玄武区",
+      "hukou": "江苏省南京市玄武区",
+      "cityNow": "江苏省南京市玄武区",
+      "address": "南京市玄武区示例路1号",
+      "isFreshGrad": "是",
+      "graduationDate": "2026-06-30",
+      "cityExpected": "江苏省南京市",
+      "cityExpected2": "江苏省苏州市",
+      "salaryExpected": "4500-5999",
+      "availableFrom": "2026-04",
+      "availableFromFull": "2026-04-30",
+      "jobNature": "全职",
+      "job": "",
+      "github": "github.com/example-dev",
+      "qq": "",
+      "wechat": "",
+      "englishLevel": "CET-4",
+      "englishScore": "456",
+      "hobby": "篮球",
+      "emergencyContact": {
+        "name": "王秀英",
+        "phone": "13900139000"
+      },
+      "speciality": "书法",
+      "stature": "175",
+      "weight": "62",
+      "hukouNature": "非农业",
+      "isForeignStudent": "否",
+      "homePlace": "江苏省南京市玄武区",
+      "nameSpellAbb": "LL",
+      "languageType": "英语",
+      "isFirstLanguage": "是",
+      "country": "中国"
+    },
+    "education": [
+      {
+        "school": "示例工业大学",
+        "schoolName": "示例工业大学",
+        "schoolProvince": "江苏省",
+        "schoolType": "境内院校",
+        "city": "江苏省南京市",
+        "department": "计算机科学与技术学院",
+        "major": "软件工程",
+        "majorDirection": "软件开发与系统设计",
+        "degree": "本科",
+        "degreeFull": "工学学士",
+        "degreeType": "学术型",
+        "isHighest": "是",
+        "eduLength": "四年制",
+        "eduType": "普通全日制",
+        "startDate": "2022-09",
+        "endDate": "2026-06",
+        "endDateFull": "2026-06-30",
+        "range": "2022.09-2026.06",
+        "rank": "其它",
+        "gradePointType": "五分制",
+        "gpa": "3.2",
+        "avgScore": "82",
+        "majorCourses": "计算机网络 数据结构 软件工程"
+      }
+    ],
+    "projects": [
+      {
+        "name": "校园二手交易平台（课程设计）",
+        "role": "独立开发",
+        "range": "2025.03-2025.06",
+        "description": "面向校园场景的二手交易平台：Spring Boot + Vue 实现商品发布、搜索、下单与站内消息；使用 MySQL 存储业务数据，Redis 缓存热点商品；完成权限、订单状态机与基础风控（重复发布拦截）。",
+        "link": ""
+      },
+      {
+        "name": "分布式网盘系统（个人项目）",
+        "role": "独立开发",
+        "range": "2025.07-2025.09",
+        "description": "个人练手项目：基于 FastAPI 实现分片上传、秒传与断点续传，S3 兼容存储后端，PostgreSQL 记录文件元数据；写了一套简单的失败重试与校验机制，保证大文件上传的完整性。",
+        "link": "github.com/example-dev/cloud-disk"
+      },
+      {
+        "name": "基于 WebGL 的数据可视化系统（毕业设计）",
+        "role": "独立开发",
+        "range": "2026.01-2026.05",
+        "description": "毕业设计：基于 WebGL 实现大规模数据点云渲染与交互分析，完成透视投影、光照模型与着色器编程；支持视角控制、区域选择与距离测量等交互操作，并对比了不同渲染批量策略的性能。",
+        "link": ""
+      }
+    ],
+    "internships": [
+      {
+        "company": "示例软件科技有限公司",
+        "position": "后端开发实习生",
+        "range": "2025.07-2025.09",
+        "startDate": "2025-07-01",
+        "endDate": "2025-09-30",
+        "description": "参与内部工单系统的后端开发：基于 Spring Boot 完成工单流转接口与权限校验，补充单元测试并修复若干并发问题；协助排查线上慢查询，优化索引后接口平均耗时下降约 40%。",
+        "refName": "示例工业大学计算机科学与技术学院",
+        "refTitle": "示例工业大学计算机科学与技术学院",
+        "refPhone": "025-88880000"
+      },
+      {
+        "company": "示例教育科技股份有限公司",
+        "position": "前端开发实习生",
+        "range": "2025.01-2025.02",
+        "startDate": "2025-01-06",
+        "endDate": "2025-02-28",
+        "description": "参与在线学习平台的前端开发：使用 Vue 完成课程列表、播放页与学习进度模块，抽离通用组件并统一交互规范；与后端联调接口，处理异常态与加载态，提升页面首屏体验。",
+        "refName": "示例工业大学计算机科学与技术学院",
+        "refTitle": "示例工业大学计算机科学与技术学院",
+        "refPhone": "025-88880000"
+      }
+    ],
+    "skills": [
+      "Java",
+      "Python",
+      "JavaScript",
+      "Spring Boot",
+      "MyBatis",
+      "React",
+      "Vue",
+      "PostgreSQL",
+      "MySQL",
+      "Git",
+      "Linux",
+      "OpenGL"
+    ],
+    "skillSummary": "编程语言：熟悉 Java 与 Python，能完成常规后端开发与脚本编写。\n前端基础：掌握 HTML5、CSS3、JavaScript（ES6+）与 Vue/React，能独立完成页面布局与交互。\n后端框架：熟悉 Spring Boot、MyBatis 与 REST 接口设计，理解常用注解与配置原理。\n数据库：熟悉 PostgreSQL/MySQL，能使用 SQL 完成查询、分析与基础调优。\n工具与工程：熟悉 Linux 常用操作与 Git 版本管理，能独立排查常见环境与日志问题。\n图形与数学：了解 OpenGL 与基础图形学，完成过数据可视化方向的毕业设计。\n语言与协作：英语四级（456），能阅读英文技术文档；有校企合作项目经验，习惯与前后端、UI 协同推进。",
+    "selfIntro": "面试官您好，我是{{name}}，示例工业大学软件工程专业2026届本科生。在校期间我完成了校园二手交易平台、分布式网盘与数据可视化毕业设计三个项目，具备从需求拆解到落地的完整闭环能力；先后在示例软件科技与示例教育科技完成后端、前端方向实习。我学习能力强、执行力高，期待加入{{company}}，把技术做成实际价值。",
+    "family": [
+      {
+        "name": "李建国",
+        "relation": "父亲",
+        "workplace": "示例市第一中学",
+        "duty": "后勤"
+      },
+      {
+        "name": "王秀英",
+        "relation": "母亲",
+        "workplace": "示例检测技术有限公司",
+        "duty": "食品检验",
+        "phone": "13900139000"
+      }
+    ],
+    "openQuestions": [
+      {
+        "type": "selfIntro",
+        "tags": [
+          "通用"
+        ],
+        "title": "自我介绍 · 600字",
+        "content": "面试官您好，我是{{name}}，示例工业大学软件工程专业2026届本科生。在校期间我完成了校园二手交易平台、分布式网盘与数据可视化毕业设计三个项目，具备从需求拆解到落地的完整闭环能力；先后在示例软件科技与示例教育科技完成后端、前端方向实习。我学习能力强、执行力高，期待加入{{company}}，把技术做成实际价值。"
+      },
+      {
+        "type": "skillSummary",
+        "tags": [
+          "清单版"
+        ],
+        "title": "评价内容 · 分类技能清单",
+        "content": "编程语言：熟悉 Java、Python。\n数据库技术：熟悉 PostgreSQL、MySQL、SQL。\n后端技术：熟悉 Spring Boot、MyBatis 与 REST 接口设计。\n前端技术：掌握 HTML5、CSS3、JavaScript 与 Vue/React。\n操作系统：熟悉 Linux 常用操作。\n图形API：了解 OpenGL。\n熟练使用 PPT、Word、Excel 等办公软件，熟练使用 Python 辅助办公。\n具有较好的分析问题能力，善于沟通和学习新知识。"
+      },
+      {
+        "type": "whyUs",
+        "tags": [
+          "技术岗"
+        ],
+        "title": "为什么选择 {{company}} · 技术岗版",
+        "content": "我关注到{{company}}在核心业务上的技术投入，以及对应届生工程能力的培养体系。我在校期间围绕 Web 开发与数据系统做过完整项目，实习中参与过实际业务模块的开发与优化，希望能把已有的工程习惯带到{{company}}的团队里，从可交付的小模块做起。"
+      },
+      {
+        "type": "career",
+        "tags": [
+          "通用"
+        ],
+        "title": "职业规划 · 三年",
+        "content": "第一年快速吃透{{position}}相关的业务与技术栈，成为可独立交付的稳定力量；第二年在一到两个核心模块上形成自己的深度；第三年希望能带小范围的技术改进，向更全面的工程师成长。"
+      }
+    ],
+    "customFields": [],
+    "fieldFlags": {}
+  },
+  "variants": {
+    "backend": {
+      "label": "后端开发",
+      "overrides": {
+        "basic": {
+          "job": "后端开发工程师"
+        },
+        "selfIntro": "面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为后端开发。我熟悉 Java 与 Spring Boot/MyBatis，理解 HTTP 协议与 REST 接口设计，熟悉 PostgreSQL/MySQL 并有调优实践；在示例软件科技实习期间参与工单系统后端开发与并发问题修复。希望能加入{{company}}，用扎实的后端能力支撑业务稳定增长。"
+      }
+    },
+    "frontend": {
+      "label": "前端开发",
+      "overrides": {
+        "basic": {
+          "job": "前端开发工程师"
+        },
+        "selfIntro": "面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为前端开发。我掌握 HTML5/CSS3/JavaScript（ES6+）与 React，接触过 Vue 与工程化构建；在示例教育科技实习期间参与在线学习平台前端开发，完成核心页面与组件抽离。期待在{{company}}打磨高质量的前端产品。"
+      }
+    },
+    "management": {
+      "label": "管理/协调岗",
+      "overrides": {
+        "basic": {
+          "job": "项目管理/运营协调"
+        },
+        "selfIntro": "面试官您好，我是{{name}}，软件工程专业2026届本科生，求职方向为管理与协调类岗位。我先后参与两个校企合作项目，在跨职能团队中承担需求对接、进度协同与交付把关；在项目中负责拆解任务、跟进风险与验收，让交付节奏可控。我沟通顺畅、以结果为导向，期待在{{company}}把团队效能做成可度量的增长。"
+      }
+    }
+  }
+}

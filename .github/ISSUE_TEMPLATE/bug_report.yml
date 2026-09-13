@@ -1,0 +1,48 @@
+name: Bug 反馈
+description: 表单没填对 / 扫描漏了 / 页面报错
+title: '[Bug] '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请确认：**不要粘贴真实个人档案、API Key、身份证等隐私内容**（可用占位符）。
+        涉及具体公司网站时，建议只写平台名（如「中石油校招」），不必贴私人链接。
+  - type: input
+    id: env
+    attributes:
+      label: 运行环境
+      description: 浏览器 + 篡改猴版本（或 exe 工作台），脚本版本号
+      placeholder: 'Edge 153 + Tampermonkey 5.x + AF-Fill v0.8.0'
+    validations:
+      required: true
+  - type: input
+    id: site
+    attributes:
+      label: 站点/平台
+      placeholder: '中石油校招 zhaopin.cnpc.com.cn · 教育背景分区'
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开……简历页
+        2. Alt+Shift+F 扫描
+        3. Alt+Shift+D 填充
+        4. 看到……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望与实际
+      placeholder: '期望「学位」=工学学士；实际为空 / 填成了……'
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: 控制台报错（F12 → Console）
+      render: text

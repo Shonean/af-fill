@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AF LLM 扫描映射 mock（同义选项消歧 / key 映射 / 防幻觉）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,'Microsoft YaHei',sans-serif;background:#EDEEF1;color:#26282E}
+.card{max-width:720px;margin:24px auto;background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:20px 26px}
+li{list-style:none;display:flex;align-items:center;margin:10px 0}
+li>span.zz{font-size:13.5px;color:#333;white-space:nowrap}
+li>span.zz i{color:red;font-style:normal}
+select,input{font:13.5px/1.5 inherit;border:1px solid #999;border-radius:3px;padding:6px 9px;min-width:220px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2 style="font-size:15px;margin-bottom:12px">LLM 扫描映射回归字段</h2>
+  <li><span class="zz"><i>*</i>绩点制：</span>
+    <div><select id="gpt"><option value="">请选择</option><option value="a">五分制绩点</option><option value="b">五分制成绩</option></select></div></li>
+  <li><span class="zz"><i>*</i>学位：</span>
+    <div><select id="xw"><option value="0">请选择</option><option value="408a">工学学士(学术学位)</option><option value="408b">工学学士(专业学位)</option></select></div></li>
+  <li><span class="zz">技术博客：</span><input type="text" id="blog" placeholder="个人主页链接"></li>
+  <li><span class="zz">配偶姓名：</span><input type="text" id="spouse" placeholder="无"></li>
+</div>
+<script>
+/* 假 GM_xmlhttpRequest：做一个固定的 OpenAI 兼容响应桩（只认 LLM 扫描映射请求） */
+window.GM_xmlhttpRequest = function (opt) {
+  var res = { ok: true };
+  try {
+    var body = JSON.parse(opt.data || '{}');
+    var user = JSON.parse((body.messages && body.messages[1] && body.messages[1].content) || '{}');
+    var fields = user.fields || [];
+    var arr = fields.map(function (f) {
+      var lab = f.label || '';
+      if (lab.indexOf('绩点制') >= 0) return { i: f.i, action: 'pick', value: f.options[0], why: '同义选项' };
+      if (lab.indexOf('学位') >= 0) {
+        var hit = (f.options || []).filter(function (o) { return o.indexOf('学术') >= 0; })[0];
+        return hit ? { i: f.i, action: 'pick', value: hit, why: '学术型' } : { i: f.i, action: 'skip' };
+      }
+      if (lab.indexOf('技术博客') >= 0) return { i: f.i, action: 'key', key: 'basic.github', why: '主页即博客' };
+      if (lab.indexOf('配偶') >= 0) return { i: f.i, action: 'key', key: 'basic.spouseNotExist', why: '幻觉测试' }; // 档案不存在 → 必须被拦
+      return { i: f.i, action: 'skip' };
+    });
+    res.responseText = JSON.stringify({ choices: [{ message: { content: JSON.stringify(arr) } }] });
+  } catch (e) { res.responseText = '{}'; }
+  setTimeout(function () { opt.onload && opt.onload(res); }, 30);
+};
+window.__llmCalls = 0;
+var _orig = window.GM_xmlhttpRequest;
+window.GM_xmlhttpRequest = function (opt) { window.__llmCalls++; return _orig(opt); };
+</script>
+<script src="../autofill.user.js"></script>
+</body>
+</html>

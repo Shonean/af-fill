@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>中国石油招聘 · 分区简历（结构复刻 mock）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,'Microsoft YaHei',sans-serif;background:#EDEEF1;color:#26282E}
+.card{max-width:980px;margin:16px auto;background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:20px 26px}
+h2{font-size:15px;margin-bottom:12px}
+li{list-style:none;display:flex;align-items:center;flex-wrap:wrap;margin:9px 0;min-height:32px}
+li>span.zz{float:left;font-size:13.5px;color:#333;white-space:nowrap}
+li>span.zz i{color:red;font-style:normal}
+.zzza{background:#FAFAFB}
+.inpppt{font:13.5px/1.5 inherit;border:1px solid #999;border-radius:3px;padding:6px 9px;min-width:200px}
+textarea.tx{width:320px;height:52px;border:1px solid #999;border-radius:3px;padding:6px 9px}
+select{font:13.5px/1.5 inherit;border:1px solid #999;border-radius:3px;padding:5px 8px;min-width:140px}
+.zz1{font-size:13.5px;margin-right:14px}
+.navwrap{max-width:980px;margin:14px auto 0;padding:0 4px}
+.znav{display:inline-block;font:12.5px/1.6 inherit;color:#555;background:#fff;border:1px solid rgba(20,20,22,.12);border-radius:99px;padding:3px 12px;margin-right:6px;cursor:pointer}
+.znav.on{background:#141416;color:#fff}
+.znav i{color:red;font-style:normal}
+.sec{display:none}
+.sec.on{display:block}
+.view{color:#555}
+.addBtn,.saveBtn,.miniBtn{font:12.5px/1.5 inherit;border:1px solid rgba(20,20,22,.25);background:#fff;border-radius:6px;padding:5px 12px;margin:8px 8px 0 0;cursor:pointer}
+.addBtn{background:#141416;color:#fff}
+.autocompleter{position:relative;background:#fff;border:1px solid #ccc;border-radius:4px;max-width:340px}
+.autocompleter-list{margin:0;padding:4px 0}
+.autocompleter-item{padding:4px 10px;cursor:pointer}
+.autocompleter-item:hover{background:#F0F0F2}
+.tip{max-width:980px;margin:14px auto 0;color:#7A6420;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:10px;padding:8px 14px;font-size:12px}
+.saved{color:#4C9E7E;font-size:12px;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="tip">结构复刻 zhaopin.cnpc.com.cn createResume 分区式简历：z1~z9 导航 + 分区容器（nextElementSibling）/ 每区独立编辑·保存 / 教育卡专业 jQuery-autocompleter 模拟。附件的 <code>#f-cv</code> 任选一个文件可触发「上传后自动扫描+填充」；Alt+Shift+F=扫描（本 mock 无适配器，走常规扫描）。</div>
+
+<div class="navwrap">
+  <div class="znav w1-11" id="z1"><span><i class="xu"></i>基本信息</span></div>
+  <div class="sec jbxx1 on" data-name="基本信息" style="display:block">
+    <div class="card">
+      <h2>基本信息 必填</h2>
+      <li><span class="zz"><i>*</i>姓名：</span><input type="text" id="basicName" name="basicName" class="inpppt" maxlength="20"></li>
+      <li><span class="zz"><i>*</i>姓名拼音缩写：</span><input type="text" id="nameSpellAbb" name="nameSpellAbb" class="inpppt" placeholder="例:“张三”拼音缩写为“ZHS”"></li>
+      <li><span class="zz">出生日期：</span><input type="text" id="basicBirthday" name="basicBirthday" class="inpppt" readonly></li>
+      <li><span class="zz"><i>*</i>性别：</span>
+        <input type="radio" name="gender" value="1"><span class="zz1">男</span>
+        <input type="radio" name="gender" value="0"><span class="zz1">女</span></li>
+      <li><span class="zz">是否留学生(?)：</span>
+        <input type="radio" name="foreignStudent" value="1"><span class="zz1">我是留学生</span>
+        <input type="radio" name="foreignStudent" value="0" checked><span class="zz1">我是全日制普通高等院校毕业生</span></li>
+      <li class="zzza xgcon"><span class="zz"><i>*</i>户口所在地：</span>
+        <span class="zz xg60">省份：</span>
+        <div id="domicilePDiv" class="xgsel"><select id="domicilePlace" name="domicilePlace">
+          <option value="0">请选择省份</option><option value="010">北京市</option><option value="320">江苏省</option><option value="160">河南省</option>
+        </select></div>
+        <span class="zz xg60">城市：</span>
+        <div id="domicileCDiv" class="xgsel"><select id="domicilePlaceC" name="domicilePlaceC">
+          <option value="0">请选择户口城市</option><option value="3201">南京市</option><option value="3202">苏州市</option><option value="3203">无锡市</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>民族：</span>
+        <div id="nationDiv"><select id="mz" name="nation">
+          <option value="0">请选择</option><option value="01">汉族</option><option value="02">蒙古族</option><option value="03">回族</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>婚姻状况：</span>
+        <div id="marriageDiv"><select id="hy" name="maritalStatus">
+          <option value="0">请选择</option><option value="1">未婚</option><option value="2">已婚</option><option value="3">离异</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>户口性质：</span>
+        <div id="hukouDiv"><select id="hk" name="category">
+          <option value="0">请选择</option><option value="1">农业</option><option value="2">非农业</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>生源地(?)：</span>
+        <div id="originDiv"><select id="sy" name="students">
+          <option value="0">请选择</option><option value="010">北京市</option><option value="320">江苏省</option><option value="160">河南省</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>健康状况：</span>
+        <div id="healthDiv"><select id="healthCondition" name="healthCondition">
+          <option value="0">请选择</option><option value="1">健康</option><option value="2">良好</option><option value="3">一般</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>籍贯(?)：</span>
+        <div id="nativePlaceDiv"><input id="nativePlaceName" name="nativePlaceName" class="inpppt autocompleter-node" placeholder="输入区县名搜索选择..."></div></li>
+      <li><span class="zz"><i>*</i>政治面貌：</span>
+        <div id="zzmmDiv"><select id="zzmm" name="politiceStatus">
+          <option value="0">请选择</option><option value="1">中共党员</option><option value="2">中共预备党员</option><option value="3">共青团员</option><option value="4">群众</option>
+        </select></div></li>
+      <li><span class="zz"><i>*</i>家庭所在地：</span>
+        <div id="homeDiv"><select id="homePlace" name="homePlace">
+          <option value="0">请选择</option><option value="010">北京市</option><option value="320">江苏省</option><option value="160">河南省</option>
+        </select></div></li>
+      <li class="zzza"><span class="zz"><i>*</i>身高：</span><input type="text" id="stature" name="stature" class="inpppt" maxlength="8">&nbsp;(厘米)</li>
+      <li class="zzza"><span class="zz"><i>*</i>体重：</span><input type="text" id="weight" name="weight" class="inpppt" maxlength="8">&nbsp;(公斤)</li>
+      <li><span class="zz"><i>*</i>特长：</span><textarea name="speciality" id="speciality" class="tx" maxlength="90"></textarea></li>
+      <li><span class="zz"><i>*</i>爱好：</span><textarea name="hobby" id="hobby" class="tx" maxlength="40"></textarea></li>
+      <li><span class="zz">附件：</span><input type="file" id="f-cv" class="inpppt"></li>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z2"><span><i></i>教育背景</span></div>
+  <div class="sec stl" data-name="教育背景">
+    <div class="card">
+      <h2>教育背景 必填</h2>
+      <div class="view">（教育背景列表为空）<span class="saved"></span><br><button type="button" class="addBtn">添加教育背景</button></div>
+      <div class="edit" style="display:none">
+        <li class="zzza"><span class="zz"><i>*</i>院校类型：</span>
+          <span class="zx">
+            <input type="radio" name="type" value="1" class="z1radio" checked><span class="zz1">境内院校</span>
+            <input type="radio" name="type" value="0" class="z1radio"><span class="zz1">境外院校</span>
+          </span></li>
+        <li class="zzza"><span class="zz"><i>*</i>省份：</span>
+          <div id="educationProvinceDiv"><select id="province" name="province" onchange="choseSchool(this)">
+            <option value="0">请选择省份</option><option value="010">北京市</option><option value="320">江苏省</option><option value="160">河南省</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>学历形式：</span>
+          <div id="educationTypeDiv"><select id="educationType" name="educationType">
+            <option value="0">请选择</option><option value="1">普通全日制</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>毕业院校：</span>
+          <div id="schoolNameDiv"><select id="schoolCode" name="schoolCode" data-req="1" onchange="selectOtherSch()">
+            <option value="0">请选择学校</option>
+          </select></div>
+          <div id="schoolNameDivInput" style="display:none"><input id="schoolChinaName" name="schoolChinaName" class="inpppt" placeholder="请填写中文院校名称"></div></li>
+        <li class="zzza"><span class="zz">学历介绍：</span>
+          <input type="checkbox" id="maxEdu" name="maxEdu" class="zxx" onclick="toggleAttach()"><span class="zz1">最高学历</span>
+          <input type="checkbox" id="maxDeg" name="maxDeg" class="zxx"><span class="zz1">最高学位</span>
+          <input type="checkbox" id="firstEdu" name="firstEdu" class="zxx" onclick="toggleAttach()"><span class="zz1">第一学历</span></li>
+        <li class="zzza"><span class="zz"><i>*</i>入学时间：</span><input type="text" id="educationStartDate" name="educationStartDate" value="" class="inp2 form_date" readonly></li>
+        <li class="zzza"><span class="zz"><i>*</i>学位：</span>
+          <div id="degreeDiv"><select id="xw" name="degree" data-req="1" onchange="eduByDegree(this)">
+            <option value="0">请选择</option><option value="408">工学学士</option><option value="407">理学学士</option><option value="412">管理学学士</option><option value="308">工学硕士</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>毕业时间：</span><input type="text" id="educationEndDate" name="educationEndDate" value="" class="inp2 form_date1" readonly></li>
+        <li class="zzza"><span class="zz">学位证书编号：</span><input type="text" id="degreeNumber" name="degreeNumber" class="zt" placeholder="如未取得可不填写"></li>
+        <li class="zzza"><span class="zz"><i>*</i>学历：</span>
+          <div><select id="xl" name="xl" data-req="1">
+            <option value="0">请选择</option><option value="31">大学本科</option><option value="21">硕士研究生</option><option value="11">博士研究生</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz">学历证书编号：</span><input type="text" id="educationNumber" name="educationNumber" class="zt" placeholder="如未取得可不填写"></li>
+        <li class="zzza"><span class="zz"><i>*</i>专业：</span>
+          <div id="majorDiv">
+            <div class="search2">
+              <input id="major" name="major" class="search2" placeholder="请输入专业关键字..." data-req="1" onkeydown="doSearchMajor()">
+            </div>
+            <input type="hidden" id="majorUnionId" name="majorUnionId">
+            <div id="majorAcWrap"></div>
+          </div></li>
+        <li class="zzza"><span class="zz"><i>*</i>绩点制：</span>
+          <div><select id="gradePointType" name="gradePointType" data-req="1">
+            <option value="">请选择</option><option value="1">四分制</option><option value="2">五分制</option><option value="3">百分制</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>专业方向：</span><input type="text" id="majorDirection" name="majorDirection" class="inpppt" placeholder="限100个字" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>学分绩点：</span><input type="text" id="gradePoint" name="gradePoint" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>学位类型：</span>
+          <span class="zx"><input type="radio" name="degreeType" value="1"><span class="zz1">学术型</span><input type="radio" name="degreeType" value="2"><span class="zz1">专业型</span></span></li>
+        <li class="zzza"><span class="zz"><i>*</i>研究方向及课题：</span><input type="text" id="researchDirection" name="researchDirection" class="inpppt" placeholder="限50个字"></li>
+        <li class="zzza"><span class="zz">其他描述：</span><textarea id="otherDesc" name="otherDesc" class="tx"></textarea></li>
+        <li class="zzza" id="attachBlock"><span class="zz"><i>*</i>选择文件：</span><input type="file" id="transcriptAttachmentFile" name="transcriptAttachmentFile" class="inpppt"></li>
+        <div><button type="button" class="saveBtn">保存教育背景</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z3"><span><i></i>外语水平</span></div>
+  <div class="sec zxzy" data-name="外语水平">
+    <div class="card">
+      <h2>外语水平</h2>
+      <div class="view">（外语水平为空）<span class="saved"></span><br><button type="button" class="addBtn">添加外语水平</button></div>
+      <div class="edit" style="display:none">
+        <li class="zzza"><span class="zz"><i>*</i>外语语种：</span>
+          <div><select id="languageType" name="languageType" data-req="1">
+            <option value="">请选择</option><option value="1">英语</option><option value="2">日语</option><option value="3">德语</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>外语水平：</span>
+          <div><select id="languageLevel" name="languageLevel" data-req="1">
+            <option value="">请选择</option><option value="1">CET-4</option><option value="2">CET-6</option><option value="3">雅思</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>是否第一外语：</span>
+          <span class="zx"><input type="radio" name="firstLanguage" value="1"><span class="zz1">是</span><input type="radio" name="firstLanguage" value="0"><span class="zz1">否</span></span></li>
+        <li class="zzza"><span class="zz"><i>*</i>成绩分数：</span><input type="text" id="languageScore" name="languageScore" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz">准考证号：</span><input type="text" id="ticketNo" name="ticketNo" class="inpppt"></li>
+        <li class="zzza"><span class="zz">报告单编号：</span><input type="text" id="reportNo" name="reportNo" class="inpppt"></li>
+        <div><button type="button" class="saveBtn">保存外语水平</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z4"><span><i></i>通讯信息</span></div>
+  <div class="sec txjl" data-name="通讯信息">
+    <div class="card">
+      <h2>通讯信息 必填</h2>
+      <div class="view">（通讯信息为空）<span class="saved"></span><br><button type="button" class="addBtn">添加通讯信息</button></div>
+      <div class="edit" style="display:none">
+        <li class="zzza"><span class="zz"><i>*</i>国家/地区：</span>
+          <div><select id="contactCountry" name="contactCountry" data-req="1"><option value="">请选择</option><option value="1">中国</option></select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>省：</span>
+          <div><select id="contactProvince" name="contactProvince" data-req="1"><option value="0">请选择</option><option value="010">北京市</option><option value="320">江苏省</option></select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>城市：</span>
+          <div><select id="contactCity" name="contactCity" data-req="1"><option value="0">请选择</option><option value="3201">南京市</option><option value="3202">苏州市</option></select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>区县：</span>
+          <div><select id="contactDistrict" name="contactDistrict" data-req="1"><option value="0">请选择</option><option value="320102">玄武区</option><option value="320104">秦淮区</option></select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>具体地址：</span><input type="text" id="contactAddress" name="contactAddress" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>手机号：</span><input type="text" id="contactPhone" name="contactPhone" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz">QQ号：</span><input type="text" id="contactQQ" name="contactQQ" class="inpppt"></li>
+        <li class="zzza"><span class="zz">邮政编码：</span><input type="text" id="contactZip" name="contactZip" class="inpppt"></li>
+        <li class="zzza"><span class="zz"><i>*</i>电子邮箱：</span><input type="text" id="contactEmail" name="contactEmail" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz">微信号：</span><input type="text" id="contactWechat" name="contactWechat" class="inpppt"></li>
+        <div><button type="button" class="saveBtn">保存通讯信息</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="znav w1-11111" id="z5"><span><i></i>实习/工作/入伍经历</span></div>
+  <div class="sec gzjl" data-name="实习/工作/入伍经历">
+    <div class="card">
+      <h2>实习/工作/入伍经历</h2>
+      <div class="view">（经历为空）<span class="saved"></span><br><button type="button" class="addBtn">添加实习/工作/入伍经历</button></div>
+      <div class="edit" style="display:none">
+        <li class="zzza"><span class="zz"><i>*</i>工作单位：</span><input type="text" id="internCompany" name="internCompany" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>职位名称：</span><input type="text" id="internPosition" name="internPosition" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>开始时间：</span><input type="text" id="internStart" name="internStart" class="inpppt" placeholder="YYYY-MM-DD" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>结束时间：</span><input type="text" id="internEnd" name="internEnd" class="inpppt" placeholder="YYYY-MM-DD" data-req="1"></li>
+        <li class="zzza"><span class="zz">省：</span>
+          <div><select id="internProvince" name="internProvince"><option value="">请选择</option><option value="320">江苏省</option><option value="010">北京市</option></select></div></li>
+        <li class="zzza"><span class="zz">城市：</span>
+          <div><select id="internCity" name="internCity"><option value="">请选择</option><option value="3201">南京市</option><option value="0101">北京市</option></select></div></li>
+        <div><button type="button" class="saveBtn">保存实习/工作/入伍经历</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z6"><span><i></i>获奖信息</span></div>
+  <div class="sec hjxx" data-name="获奖信息">
+    <div class="card">
+      <h2>获奖信息</h2>
+      <div class="view">（获奖为空）<br><button type="button" class="addBtn">添加获奖信息</button></div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z7"><span><i></i>家庭成员</span></div>
+  <div class="sec jtcy" data-name="家庭成员">
+    <div class="card">
+      <h2>家庭成员 必填</h2>
+      <div class="view">（成员为空）<span class="saved"></span><br><button type="button" class="addBtn">添加家庭成员</button></div>
+      <div class="edit" style="display:none">
+        <li class="zzza"><span class="zz"><i>*</i>姓名：</span><input type="text" id="familyName" name="familyName" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>与本人关系：</span>
+          <div><select id="familyRelation" name="familyRelation" data-req="1">
+            <option value="0">请选择</option><option value="1">父亲</option><option value="2">母亲</option><option value="3">配偶</option><option value="4">子女</option>
+          </select></div></li>
+        <li class="zzza"><span class="zz"><i>*</i>工作单位：</span><input type="text" id="familyWorkplace" name="familyWorkplace" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz"><i>*</i>职位：</span><input type="text" id="familyDuty" name="familyDuty" class="inpppt" data-req="1"></li>
+        <li class="zzza"><span class="zz">电话：</span><input type="text" id="familyPhone" name="familyPhone" class="inpppt"></li>
+        <div><button type="button" class="saveBtn">保存家庭成员</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z8"><span><i></i>其它资格</span></div>
+  <div class="sec qtzg" data-name="其它资格">
+    <div class="card">
+      <h2>其它资格</h2>
+      <div class="view">（其它资格为空）<br><button type="button" class="addBtn">添加其它资格</button></div>
+    </div>
+  </div>
+
+  <div class="znav w1-11" id="z9"><span><i></i>附件</span></div>
+  <div class="sec qtfj" data-name="附件">
+    <div class="card"><h2>附件</h2><div class="view">（附件不上传 · 人工处理）</div></div>
+  </div>
+</div>
+
+<script>
+/* ===== mock 站点的行为：分区切换 / 卡片增删 / 保存计数 / 教育卡联动 / 专业 autocompleter ===== */
+window.__saves = {};
+window.__dialogs = [];
+window.__evt = [];
+function saveOk(name){ window.__saves[name] = (window.__saves[name] || 0) + 1; }
+function choseSchool(sel) {
+  var sc = document.getElementById('schoolCode');
+  sc.innerHTML = '<option value="0">请选择学校</option>';
+  if (sel.value === '320') {
+    sc.innerHTML += '<option value="320100001">示例工业大学</option><option value="320100002">示例理工大学</option>';
+  } else if (sel.value === '010') {
+    sc.innerHTML += '<option value="110100001">北京大学</option>';
+  }
+}
+function selectOtherSch() {
+  var sc = document.getElementById('schoolCode');
+  var input = document.getElementById('schoolNameDivInput');
+  if (sc.value === '0' || sc.value === '') { input.style.display = 'none'; }
+  else { input.style.display = 'none'; }
+}
+function eduByDegree(sel) {
+  var name = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  var xl = document.getElementById('xl');
+  if (name.indexOf('博士') !== -1) xl.value = '11';
+  else if (name.indexOf('硕士') !== -1) xl.value = '21';
+  else if (name.indexOf('学士') !== -1) xl.value = '31';
+}
+function toggleAttach() {}
+function doSearchMajor() {
+  var el = document.getElementById('major');
+  if (el._acBound) return;
+  el._acBound = true;
+  el.addEventListener('keyup', function () {
+    var q = el.value;
+    var wrap = document.getElementById('majorAcWrap');
+    if (!q) { wrap.innerHTML = ''; return; }
+    var list = ['软件工程', '软件工程（嵌入式方向）', '计算机科学与技术', '网络工程', '人工智能'];
+    var hits = list.filter(function (t) { return t.indexOf(q) !== -1; });
+    wrap.innerHTML = hits.length ? '<div class="autocompleter"><ul class="autocompleter-list">' +
+      hits.map(function (t) { return '<li class="autocompleter-item" data-label="' + t + '" data-value="M' + (t.length * 97) + '">' + t + '</li>'; }).join('') +
+      '</ul></div>' : '';
+    wrap.querySelectorAll('.autocompleter-item').forEach(function (li) {
+      li.addEventListener('mousedown', function () {
+        el.value = li.getAttribute('data-label');
+        document.getElementById('majorUnionId').value = li.getAttribute('data-value');
+        wrap.innerHTML = '';
+      });
+    });
+  });
+}
+document.querySelectorAll('.znav').forEach(function (z) {
+  z.addEventListener('click', function () {
+    document.querySelectorAll('.znav').forEach(function (x) { x.classList.remove('on'); });
+    z.classList.add('on');
+    document.querySelectorAll('.sec').forEach(function (s) { s.style.display = 'none'; });
+    var sec = z.nextElementSibling;
+    if (sec) sec.style.display = 'block';
+  });
+});
+document.querySelectorAll('.sec').forEach(function (sec) {
+  var name = sec.getAttribute('data-name');
+  var view = sec.querySelector('.view');
+  var edit = sec.querySelector('.edit');
+  var add = view ? view.querySelector('.addBtn') : null;
+  var save = edit ? edit.querySelector('.saveBtn') : null;
+  if (!add || !edit) return;
+  window.__adds = window.__adds || {};
+  var list = document.createElement('div');
+  view.insertBefore(list, add);
+  var curIdx = -1;
+  add.addEventListener('click', function () {
+    window.__adds[name] = (window.__adds[name] || 0) + 1;
+    window.__evt.push('add:' + name);
+    curIdx = -1;
+    edit.style.display = ''; view.style.display = 'none';
+  });
+  save.addEventListener('click', function () {
+    var bad = [].slice.call(edit.querySelectorAll('[data-req]')).filter(function (el) { return !el.value; });
+    window.__evt.push('save:' + name + ':' + curIdx + ':' + bad.length);
+    window.__savedbg = window.__savedbg || [];
+    window.__savedbg.push({ name: name, bad: bad.map(function (el) { return el.id || el.name; }) });
+    if (bad.length) { window.__dialogs.push('校验未过:' + (bad[0].id || bad[0].name)); window.alert('请完善必填项：' + (bad[0].id || bad[0].name)); return; }
+    saveOk(name);
+    window.__evt.push('saved:' + name + ':' + curIdx);
+    if (curIdx < 0) {                                    // 新增记录 → 查看态出现「修改」入口（复刻真实站点）
+      curIdx = list.children.length;
+      var m = document.createElement('span');
+      m.className = 'modBtn';
+      m.textContent = '修改';
+      m.setAttribute('data-idx', String(curIdx));
+      m.style.cssText = 'display:inline-block;margin:6px 8px 0 0;color:#4C6E9E;cursor:pointer';
+      list.appendChild(m);
+    }
+    edit.style.display = 'none'; view.style.display = '';
+    var sv = view.querySelector('.saved');
+    if (sv) sv.textContent = '已保存 ' + window.__saves[name] + ' 条';
+  });
+  list.addEventListener('click', function (e) {
+    var m = e.target && e.target.closest ? e.target.closest('.modBtn') : null;
+    if (!m) return;
+    curIdx = parseInt(m.getAttribute('data-idx'), 10) || 0;
+    window.__evt.push('mod:' + name + ':' + curIdx);
+    edit.style.display = ''; view.style.display = 'none';
+  });
+});
+</script>
+<script src="../autofill.user.js"></script>
+</body>
+</html>

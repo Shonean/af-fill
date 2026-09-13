@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AF-Fill 工作台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif}
+body{background:#EDEEF1;color:#141416;font-size:13.5px}
+.top{display:flex;align-items:center;gap:14px;background:#fff;border-bottom:1px solid rgba(20,20,22,.1);padding:13px 22px}
+.top b{font-size:15px}
+.top .v{font:400 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:#A6A7AE}
+.syserr{display:none;background:#F9E9EA;border:1px solid #E5B8BC;border-radius:9px;padding:10px 14px;font-size:12px;color:#8F2F35;line-height:1.7;margin:10px 22px 0}
+.syserr b{display:block;margin-bottom:2px}
+.syserr .x{float:right;cursor:pointer;font-weight:700;padding:0 4px}
+.dot{width:8px;height:8px;border-radius:50%;background:#B4B5BB;display:inline-block}
+.dot.on{background:#4C9E7E}
+.stat{font:400 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#74757C}
+.tabs{position:sticky;top:0;z-index:5;background:#EDEEF1;display:flex;gap:6px;padding:12px 22px 0;max-width:1500px;margin:0 auto;flex-wrap:wrap}
+.tabs button{background:#fff;border:1px solid rgba(20,20,22,.14);border-radius:9px 9px 0 0;color:#74757C;font-size:12.5px;padding:9px 18px 8px;border-bottom:none}
+.tabs button:hover{color:#141416}
+.tabs button.on{background:#141416;color:#fff;border-color:#141416}
+.page{display:none;max-width:1500px;margin:0 auto;padding:14px 22px 60px}
+.page.on{display:block}
+.page .card{margin-bottom:14px}
+.card{background:#fff;border:1px solid rgba(20,20,22,.09);border-radius:12px;padding:14px 16px}
+.card h3{font-size:12px;letter-spacing:.08em;color:#74757C;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .r{margin-left:auto}
+.bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+button{cursor:pointer;border:none;border-radius:8px;font-size:12px;font-weight:500;padding:7px 13px;background:#141416;color:#fff}
+button:hover{background:#2A2A2E}
+button.ghost{background:#fff;border:1px solid rgba(20,20,22,.2);color:#74757C}
+button.ghost:hover{border-color:#141416;color:#141416}
+button:disabled{opacity:.4;cursor:not-allowed}
+input,select,textarea{font:12.5px/1.5 inherit;background:#F7F7F8;border:1px solid rgba(20,20,22,.14);border-radius:8px;padding:7px 9px;color:#141416}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#141416}
+textarea{width:100%;resize:vertical}
+.lrow{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid rgba(20,20,22,.06);cursor:pointer}
+.lrow:hover{background:#FAFAFB}
+.lrow.sel{background:#F7F7F8}
+.pill{font-size:10.5px;padding:3px 9px;border-radius:99px;background:#F1F1F3;color:#74757C;white-space:nowrap}
+.pill.s-已打开{background:#FCF6E8;color:#7A6420}
+.pill.s-已填{background:#E9F3EE;color:#2F6E51}
+.pill.s-已投{background:#141416;color:#fff}
+.pill.s-面试{background:#E8EEF7;color:#3A5A8C}
+.pill.s-挂{background:#F9E9EA;color:#C6484E}
+.lt{flex:1;min-width:0}
+.lt b{font-size:13px;font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt span{font-size:11px;color:#A6A7AE;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font:400 10px/1.6 ui-monospace,Consolas,monospace;color:#A6A7AE;white-space:nowrap}
+.empty{color:#A6A7AE;font-size:12px;padding:18px 4px;text-align:center}
+.hint{font-size:11px;color:#A6A7AE;line-height:1.7;margin-top:8px}
+.banner{display:block;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:9px;padding:9px 12px;font-size:11.5px;color:#7A6420;line-height:1.7;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid2 label{font-size:11px;color:#74757C;display:block;margin-bottom:3px}
+.fRow{margin-bottom:8px}
+.msg{font-size:11.5px;color:#2F6E51;margin-top:6px;min-height:16px}
+.msg.err{color:#C6484E}
+.log{font:400 9.5px/1.7 ui-monospace,Consolas,monospace;color:#74757C;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.stacktag{display:inline-block;font-size:10px;background:#F1F1F3;border-radius:5px;padding:2px 6px;margin:1px 3px 1px 0;color:#5A5C64}
+.match-h{color:#2F6E51}.match-m{color:#7A6420}.match-l{color:#C6484E}
+.det{background:#FAFAFB;border:1px solid rgba(20,20,22,.08);border-radius:10px;padding:12px;margin-top:10px}
+.jdp{font-size:11px;color:#74757C;max-height:150px;overflow:auto;white-space:pre-wrap;background:#F7F7F8;border-radius:8px;padding:9px 11px;margin-top:8px}
+.ov{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.ov .stat2{background:#fff;border:1px solid rgba(20,20,22,.09);border-radius:12px;padding:14px 16px}
+.ov .stat2 b{display:block;font-size:26px;font-weight:600;line-height:1.2}
+.ov .stat2 span{font-size:11px;color:#74757C;letter-spacing:.06em}
+.ov .stat2.dark b{color:#141416}.ov .stat2.green b{color:#2F6E51}.ov .stat2.blue b{color:#3A5A8C}.ov .stat2.red b{color:#C6484E}
+@media (max-width:860px){.ov{grid-template-columns:1fr 1fr}}
+.impstep{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;font-size:12px;color:#74757C}
+.impstep .no{width:18px;height:18px;border-radius:50%;background:#F1F1F3;color:#74757C;display:flex;align-items:center;justify-content:center;font-size:10px;flex:none;margin-top:1px}
+.impstep.ok .no{background:#E9F3EE;color:#2F6E51}
+.impstep.run .no{background:#FCF6E8;color:#7A6420}
+.impstep .t b{display:block;color:#141416;font-weight:500}
+.impstep .t span{font-size:11px;color:#A6A7AE}
+.impsteps{display:none;margin-top:10px;border-top:1px dashed rgba(20,20,22,.1);padding-top:10px}
+.resume{display:flex;flex-direction:column;gap:12px}
+.rsec{border:1px solid rgba(20,20,22,.08);border-radius:12px;background:#FCFCFD;padding:14px 16px}
+.rsec h4{font-size:11px;letter-spacing:.1em;color:#74757C;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.rsec h4::before{content:"";width:3px;height:12px;background:#141416;border-radius:1px;opacity:.75}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:9px 18px}
+.rkv{min-width:0}
+.rkv label{display:block;font-size:10.5px;color:#A6A7AE;letter-spacing:.05em;margin-bottom:1px}
+.rkv b{font-weight:500;font-size:13px;word-break:break-all;line-height:1.5}
+.rkv b.miss{color:#C9CACF;font-weight:400}
+.ritem{padding:9px 0 4px;border-bottom:1px dashed rgba(20,20,22,.08)}
+.ritem:last-child{border-bottom:none}
+.ritem .t{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ritem .t b{font-size:13.5px;font-weight:600}
+.ritem .t span{font-size:11.5px;color:#74757C}
+.ritem .d{font-size:12px;color:#5A5C64;line-height:1.8;white-space:pre-wrap;margin-top:5px}
+.rtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rtags span{font-size:11px;background:#F1F1F3;border-radius:6px;padding:3px 8px;color:#5A5C64}
+.rlong{font-size:12px;color:#5A5C64;line-height:1.8;white-space:pre-wrap}
+.rq{border-left:2px solid rgba(20,20,22,.1);padding:2px 0 4px 10px;margin-top:8px}
+.rq b{font-size:12.5px}
+.rq p{font-size:12px;color:#5A5C64;line-height:1.75;white-space:pre-wrap;margin-top:3px}
+.rfoot{font-size:10.5px;color:#A6A7AE;text-align:right}
+.redit{outline:none;border-radius:5px;transition:background .15s,box-shadow .15s}
+b.redit{font-weight:500;font-size:13px;word-break:break-all;line-height:1.5;display:inline-block;min-width:24px}
+div.redit{font-size:12px;color:#5A5C64;line-height:1.8;white-space:pre-wrap}
+.redit:hover{background:#F1F1F3;box-shadow:0 0 0 3px #F1F1F3}
+.redit:focus{background:#FFF9E8;box-shadow:0 0 0 3px #F3E7C3}
+.redit.miss{color:#C9CACF;font-weight:400}
+#resumeView{user-select:text}
+
+</style>
+</head>
+<body>
+<div class="top">
+  <b>AF-Fill 工作台</b><span class="v" id="ver">V0.7.0</span>
+  <span><span class="dot" id="dotEdge"></span> Edge <span class="stat" id="edgeVer"></span></span>
+  <span><span class="dot" id="dotCdp"></span> CDP</span>
+  <span class="stat" id="pageCnt"></span>
+  <span class="stat" id="errMsg" style="color:#C6484E"></span>
+</div>
+
+<div class="syserr" id="syserr"><span class="x" id="syserrX">✕</span><b id="syserrTitle"></b><span id="syserrBody"></span></div>
+
+<div class="tabs" id="tabs">
+  <button data-p="overview">概览</button>
+  <button data-p="queue">网申队列</button>
+  <button data-p="watch">盯梢</button>
+  <button data-p="draft">AI 代笔</button>
+  <button data-p="profile">档案 Profile</button>
+  <button data-p="settings">设置</button>
+</div>
+
+<div class="page" id="page-overview">
+  <div id="ovBanner" class="banner" style="display:none">
+    <b>首次使用：</b>到「档案 Profile」页粘贴/编辑档案 JSON 并保存（至少姓名、手机、邮箱）；或到任意网申页手工填一遍后回档案页「采集本页已填 → Profile」一键回读。档案越全，识别越准。
+  </div>
+  <div class="ov">
+    <div class="stat2 dark"><b id="ovLedger">–</b><span>台账职位总数</span></div>
+    <div class="stat2 red"><b id="ovCands">–</b><span>待审盯梢候选</span></div>
+    <div class="stat2 green"><b id="ovYitou">–</b><span>已投递</span></div>
+    <div class="stat2 blue"><b id="ovMianshi">–</b><span>面试中</span></div>
+  </div>
+  <div class="card">
+    <h3>打开网页 <span class="r stat">在内置 Edge 新标签打开（引擎自动注入）</span></h3>
+    <div class="bar">
+      <input id="ovUrl" style="flex:1;min-width:240px" placeholder="输入网址，如 mail.qq.com / 招聘官网 …">
+      <button id="ovOpen">打开</button>
+      <button class="ghost" id="ovQQ">QQ 邮箱</button>
+      <span class="stat" id="ovUrlState"></span>
+    </div>
+    <p class="hint">打开后自动切到「浏览」页签；页面右下角会出现 AF 悬浮球（引擎已注入）。收藏与已登录站点可在「浏览」页签的 Edge 里直接用。</p>
+  </div>
+  <div class="card">
+    <h3>快捷操作</h3>
+    <div class="bar" style="margin:0">
+      <button id="ovScan">立即扫描盯梢</button>
+      <button class="ghost" id="ovGotoWatch">去盯梢审核 →</button>
+      <button class="ghost" id="ovGotoQueue">去网申队列 →</button>
+      <span class="stat" id="ovScanState"></span>
+    </div>
+    <p class="hint">日常节奏：盯梢扫新 → 候选审核「收」进台账 → 勾选批量打开逐页核对填充 → 提交永远自己点 → 标「已投」。</p>
+  </div>
+</div>
+
+<div class="page" id="page-queue">
+  <div class="card">
+    <h3>收录</h3>
+    <div class="bar">
+      <select id="tabSel" style="flex:1"></select>
+      <button class="ghost" id="btnCollect">收录此页</button>
+    </div>
+    <p class="hint">页面左下角有「+ 台账」chip（快捷键 Alt+Shift+C）→ 收录当前职位页并自动打标签。</p>
+  </div>
+  <div class="card">
+    <h3>投递台账 <span class="r stat" id="ledStat"></span></h3>
+    <div class="bar">
+      <button class="ghost" id="btnAll">全选/清空</button>
+      <button id="btnQueue">批量打开（队列）</button>
+      <span class="hint" style="margin:0">勾选 → 逐个错峰开页；填充后自动标「已填」，提交后你手动标「已投」</span>
+    </div>
+    <div id="ledger"></div>
+    <div id="detail"></div>
+  </div>
+</div>
+
+<div class="page" id="page-watch">
+  <div class="card">
+    <h3>盯梢 · 候选审核 <span class="r stat" id="wStat"></span></h3>
+    <div class="bar">
+      <button id="btnScan">立即扫描</button>
+      <span class="stat" id="wScanState"></span>
+      <select id="wInterval" style="flex:0 0 110px">
+        <option value="0">手动扫描</option><option value="1">每 1 小时</option>
+        <option value="6">每 6 小时</option><option value="12">每 12 小时</option>
+      </select>
+      <button class="ghost" id="btnWCfg">存扫描设置</button>
+    </div>
+    <div class="log" id="wLog" style="max-height:88px;margin-bottom:10px"></div>
+    <div id="wCands"></div>
+    <p class="hint">候选由盯梢源自动抓取并去重合并（「源N」= 多个源报了同一条）。LLM 已配置时自动过滤并标注理由；「忽略」的条目任何源再抓到都不会复活。收进台账后走正常投递流程。</p>
+  </div>
+  <div class="card">
+    <h3>盯梢源</h3>
+    <div id="wSources"></div>
+    <div class="grid2" style="margin-top:8px">
+      <div><label>名称（可空）</label><input id="wsName" style="width:100%" placeholder="高顿央国企"></div>
+      <div><label>列表深度</label><input id="wsPages" type="number" value="3" min="1" max="10" style="width:100%"></div>
+    </div>
+    <div class="fRow" style="margin-top:6px"><input id="wsUrl" style="width:100%" placeholder="https://… 汇总站/频道页 URL"></div>
+    <div class="bar" style="margin:6px 0 0"><button class="ghost" id="btnWsAdd">添加源</button></div>
+    <p class="hint">「列表深度」= 每源抓取预算（页数×6 个请求）。AJAX「加载更多」型站点下一版走 render 模式。</p>
+  </div>
+  <div class="card">
+    <h3>过滤标准（LLM）</h3>
+    <textarea id="wPrompt" rows="6" style="font:10px/1.6 ui-monospace,Consolas,monospace" spellcheck="false"></textarea>
+    <div class="bar" style="margin-top:8px"><button class="ghost" id="btnWPrompt">保存标准</button><span class="stat" id="wLlm"></span></div>
+  </div>
+</div>
+
+<div class="page" id="page-draft">
+  <div class="card">
+    <h3>开放题 AI 代笔</h3>
+    <div class="bar">
+      <select id="draftType"><option>自我介绍</option><option>为什么选我们</option><option>职业规划</option><option>自定义</option></select>
+      <button id="btnDraft" style="flex:1">生成初稿</button>
+    </div>
+    <textarea id="draftJd" rows="5" placeholder="粘贴 JD，或先在网申队列选中一条带 JD 的记录"></textarea>
+    <div id="draftOut" class="jdp" style="display:none"></div>
+    <div class="bar" style="margin-top:8px"><button class="ghost" id="btnCopyDraft" style="display:none">复制初稿</button></div>
+    <div class="msg" id="draftMsg"></div>
+  </div>
+</div>
+
+<div class="page" id="page-profile">
+  <div class="card">
+    <h3>档案预览 <span class="r"><span class="stat" id="resumeSaveState"></span><button class="ghost" id="btnProfEdit">编辑 JSON</button></span></h3>
+    <p class="hint" style="margin:-4px 0 10px">点任意文字<b>直接编辑</b>（单行 Enter 提交，多行可直接换行/粘贴纯文本）→ 失焦自动保存并同步 JSON。</p>
+    <div id="profBanner" class="banner" style="display:none">
+      <b>首次使用：</b>① 直接点下面任意文字填写（失焦自动保存），或点右上「编辑 JSON」粘贴完整档案（至少填姓名、手机、邮箱）；或者 ② 到任意网申页把表单<b>手工填一遍</b>，引擎会自动学习回档案。档案越全，识别越准。
+    </div>
+    <div id="resumeView" class="resume"></div>
+  </div>
+  <div class="card" id="profEditCard" style="display:none">
+    <h3>Profile JSON（高级编辑） <span class="r"><button class="ghost" id="btnProfClose">收起</button></span></h3>
+    <textarea id="profArea" rows="14" spellcheck="false" style="font:10px/1.5 ui-monospace,Consolas,monospace"></textarea>
+    <div class="bar" style="margin-top:8px">
+      <button class="ghost" id="btnProfLoad">重新载入</button>
+      <button id="btnProfSave">校验并保存</button>
+    </div>
+    <div class="msg" id="profMsg"></div>
+  </div>
+</div>
+
+<div class="page" id="page-settings">
+  <div class="card">
+    <h3>LLM 接口 <span class="r pill" id="llmState">未配置</span></h3>
+    <div class="fRow"><label>Base URL</label><input id="llmBase" style="width:100%" placeholder="https://api.deepseek.com"></div>
+    <div class="grid2">
+      <div class="fRow"><label>API Key</label><input id="llmKey" type="password" style="width:100%" placeholder="sk-…"></div>
+      <div class="fRow"><label>模型名</label><input id="llmModel" style="width:100%" placeholder="deepseek-chat"></div>
+    </div>
+    <div class="bar" style="margin:0"><button class="ghost" id="btnLlm">保存配置</button><button class="ghost" id="btnLlmTest">测试连通</button><span class="stat" id="llmTest"></span></div>
+    <p class="hint">配置后：盯梢候选自动过滤打分、台账自动打标签、开放题 AI 代笔全部启用。Key 只存本机 data/config.json，不经手任何第三方。</p>
+  </div>
+  <div class="card">
+    <h3>从我的 Edge 导入收藏 / 密码 / 登录态</h3>
+    <p class="hint" style="margin-top:0">把日常 Edge 的收藏夹、保存的密码、Cookie 登录态、自动填充地址一次性复制到求职 Edge —— 应用内「浏览」页签里即可像自己的 Edge 一样使用（含密码自动填充）。</p>
+    <div class="bar" style="margin-top:10px">
+      <button class="ghost" id="btnImp">开始导入</button>
+      <span class="stat" id="impState"></span>
+    </div>
+    <div class="impsteps" id="impSteps">
+      <div class="impstep" id="ist1"><div class="no">1</div><div class="t"><b>检测日常 Edge</b><span id="ist1t">检测中…</span></div></div>
+      <div class="impstep" id="ist2"><div class="no">2</div><div class="t"><b>备份求职 Edge 现有数据</b><span>→ data\backup\</span></div></div>
+      <div class="impstep" id="ist3"><div class="no">3</div><div class="t"><b>复制身份数据</b><span>收藏夹 · 密码 · Cookie · 自动填充</span></div></div>
+      <div class="impstep" id="ist4"><div class="no">4</div><div class="t"><b>重启求职 Edge</b><span>自动化引擎自动重连并重新停靠</span></div></div>
+    </div>
+    <p class="hint">⚠ 需要先完全退出日常 Edge（文件占用）；扩展不迁移；个别受保护设置（如默认搜索引擎）可能重置。导入后求职 Edge 含真实登录态，调试端口仅监听本机 127.0.0.1。</p>
+  </div>
+  <div class="card">
+    <h3>日志</h3>
+    <div class="log" id="logs"></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let STATE = null, WATCH = null, SEL = new Set(), SELID = null, POLL = null;
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const host = u => { try { return new URL(u).host; } catch (e) { return ''; } };
+
+async function api(path, body) {
+  const opt = body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {};
+  let r;
+  try {
+    r = await fetch(path, opt);
+  } catch (e) {
+    const msg = '工作台服务未响应（127.0.0.1:8790 连不上）。多半是服务被杀毒软件终止：请从托盘图标退出后重新打开「求职工作台」；若反复发生，请把程序目录加入 Windows Defender 白名单。详细日志在程序目录 data\\logs\\app.log。';
+    showSysErr('服务连接失败', msg);
+    throw new Error('服务未响应 · 详情见顶部红条');
+  }
+  if (!r.ok) { let e = {}; try { e = await r.json(); } catch (_) {} throw new Error(e.error || ('HTTP ' + r.status)); }
+  return r.json();
+}
+
+function showSysErr(title, body) {
+  $('#syserrTitle').textContent = title;
+  $('#syserrBody').textContent = body;
+  $('#syserr').style.display = 'block';
+}
+$('#syserrX').addEventListener('click', () => { $('#syserr').style.display = 'none'; });
+
+const PAGES = ['overview', 'queue', 'watch', 'draft', 'profile', 'settings'];
+function goto(page) {
+  if (!PAGES.includes(page)) page = 'overview';
+  document.querySelectorAll('.page').forEach(s => s.classList.toggle('on', s.id === 'page-' + page));
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.p === page));
+  if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => goto(b.dataset.p)));
+
+function pillCls(s) { return 'pill' + (['已打开','已填','已投','面试','挂'].includes(s) ? ' s-' + s : ''); }
+
+function render() {
+  const d = STATE.driver || {};
+  $('#dotEdge').className = 'dot' + (d.edge ? ' on' : '');
+  $('#dotCdp').className = 'dot' + (d.cdp ? ' on' : '');
+  $('#edgeVer').textContent = d.edgeVer || (d.lazy ? '待启动 · 打开职位时自动拉起' : '');
+  $('#errMsg').textContent = d.error || '';
+  const vis = (STATE.pages || []).filter(p => p.visible && !p.url.startsWith('about:')).length;
+  $('#pageCnt').textContent = 'TABS ' + (STATE.pages || []).length + ' · 可见 ' + vis;
+  $('#llmState').textContent = STATE.llmReady ? '已配置' : '未配置';
+  $('#ledStat').textContent = (STATE.ledger.entries || []).length + ' 条';
+
+  const es = STATE.ledger.entries || [];
+  const cnt = s => es.filter(e => e.status === s).length;
+  $('#ovLedger').textContent = es.length;
+  $('#ovYitou').textContent = cnt('已投');
+  $('#ovMianshi').textContent = cnt('面试');
+  $('#ovCands').textContent = WATCH ? WATCH.stats.total : '–';
+
+  const ts = $('#tabSel'); const cur = ts.value;
+  ts.innerHTML = (STATE.pages || []).filter(p => !p.url.startsWith('about:') && !p.url.includes(':8790'))
+    .map((p, k) => `<option value="${p.i}">${esc(p.title || host(p.url) || 'tab ' + p.i)}</option>`).join('');
+  if ([...ts.options].some(o => o.value === cur)) ts.value = cur;
+
+  const L = $('#ledger');
+  if (!es.length) { L.innerHTML = '<div class="empty">还没有收录 · 打开职位页点左下角「+ 台账」，或在「盯梢」页把候选「收」进台账</div>'; }
+  else {
+    L.innerHTML = es.map(e => `
+      <div class="lrow ${SELID === e.id ? 'sel' : ''}" data-id="${e.id}">
+        <input type="checkbox" class="ck" data-id="${e.id}" ${SEL.has(e.id) ? 'checked' : ''}>
+        <span class="${pillCls(e.status)}">${esc(e.status)}</span>
+        <div class="lt">
+          <b>${esc(e.company || e.title || host(e.url))}${e.position ? ' · ' + esc(e.position) : ''}</b>
+          <span>${esc(host(e.url))}${e.city ? ' · ' + esc(e.city) : ''}${e.salary ? ' · ' + esc(e.salary) : ''}${e.match ? ' · ' : ''}${e.match ? `<span class="match-${e.match === '高' ? 'h' : e.match === '中' ? 'm' : 'l'}">${esc(e.match)}匹配</span>` : ''}</span>
+        </div>
+        <div class="meta">${(e.stack || []).slice(0, 3).map(esc).join(' ')}${e.updatedAt ? '<br>' + esc(e.updatedAt) : ''}</div>
+        <button class="ghost" data-act="open" data-id="${e.id}">打开</button>
+        <button class="ghost" data-act="yitou" data-id="${e.id}">标已投</button>
+        <button class="ghost" data-act="tag" data-id="${e.id}">${e.llmTagged ? '重打标签' : '打标签'}</button>
+        <button class="ghost" data-act="del" data-id="${e.id}">删</button>
+      </div>`).join('');
+  }
+
+  const sel = es.find(e => e.id === SELID);
+  const det = $('#detail');
+  if (!sel) { det.innerHTML = ''; }
+  else {
+    det.innerHTML = `
+      <div class="det">
+        <div class="grid2">
+          <div><label>公司</label><input id="d-co" style="width:100%" value="${esc(sel.company)}"></div>
+          <div><label>岗位</label><input id="d-po" style="width:100%" value="${esc(sel.position)}"></div>
+          <div><label>城市</label><input id="d-ci" style="width:100%" value="${esc(sel.city)}"></div>
+          <div><label>薪资</label><input id="d-sa" style="width:100%" value="${esc(sel.salary)}"></div>
+        </div>
+        <div class="fRow" style="margin-top:8px"><label>备注</label><input id="d-no" style="width:100%" value="${esc(sel.note)}"></div>
+        ${sel.summary ? `<div style="font-size:12px;color:#74757C;margin:6px 0">${esc(sel.summary)} <span class="meta">${esc((sel.match || '') + ' 匹配')}</span></div>` : ''}
+        ${(sel.stack || []).length ? `<div>${sel.stack.map(s => `<span class="stacktag">${esc(s)}</span>`).join('')}</div>` : ''}
+        ${sel.jd ? `<div class="jdp">${esc(sel.jd.slice(0, 1200))}${sel.jd.length > 1200 ? '…' : ''}</div>` : ''}
+        <div class="bar" style="margin-top:10px">
+          <button id="d-save">保存修改</button>
+          <span class="meta">${esc(sel.url)}</span>
+        </div>
+        <div class="meta">轨迹：${esc((sel.events || []).map(x => x.what + '@' + x.t).join(' → '))}</div>
+      </div>`;
+    $('#d-save').addEventListener('click', async () => {
+      try {
+        await api('/api/ledger/update', { id: sel.id, patch: {
+          company: $('#d-co').value, position: $('#d-po').value,
+          city: $('#d-ci').value, salary: $('#d-sa').value, note: $('#d-no').value } });
+        poll();
+      } catch (e) { alert(e.message); }
+    });
+  }
+
+  document.querySelectorAll('.lrow .ck').forEach(ck => ck.addEventListener('click', e => {
+    e.stopPropagation();
+    const id = +ck.dataset.id;
+    ck.checked ? SEL.add(id) : SEL.delete(id);
+  }));
+}
+
+async function poll() {
+  try {
+    STATE = await api('/api/state');
+    WATCH = await api('/api/watch/state');
+    $('#syserr').style.display = 'none';          // 服务恢复 → 撤红条
+    render();
+    renderWatch();
+  } catch (e) {
+    $('#errMsg').textContent = 'workbench offline';
+    if (!String(e.message).includes('顶部红条')) showSysErr('与工作台服务失去联系', '轮询失败：' + e.message);
+  }
+}
+
+function renderWatch() {
+  if (!WATCH) return;
+  $('#wStat').textContent = `候选 ${WATCH.stats.total} · 已忽略 ${WATCH.stats.ignored}`;
+  $('#wLlm').textContent = WATCH.llmReady ? 'LLM ✓' : 'LLM 未配置（不过滤）';
+  const sc = WATCH.scan;
+  $('#btnScan').disabled = sc.running;
+  const scanTxt = sc.running ? ('扫描中 · ' + (sc.phase || ''))
+    : (sc.last ? (sc.last.error ? ('上次失败: ' + sc.last.error.slice(0, 40))
+      : `上次 ${sc.lastAt}: ${sc.last.sources} 源 · 新 ${sc.last.new} · 过滤 ${sc.last.filtered}`) : '尚未扫描');
+  $('#wScanState').textContent = scanTxt;
+  $('#ovScanState').textContent = scanTxt;
+  $('#ovScan').disabled = sc.running;
+  $('#wLog').textContent = (WATCH.log || []).join('\n');
+  $('#wInterval').value = String(WATCH.intervalHours || 0);
+  $('#profBanner').style.display = STATE.profileEmpty ? 'block' : 'none';
+  $('#ovBanner').style.display = STATE.profileEmpty ? 'block' : 'none';
+  const pr = $('#wPrompt');
+  if (document.activeElement !== pr) pr.value = WATCH.prompt || '';
+
+  $('#wSources').innerHTML = (WATCH.sources || []).map(s => `
+    <div class="lrow" style="padding:6px 0">
+      <span class="pill ${s.enabled ? 's-已填' : ''}">${s.enabled ? '启用' : '停用'}</span>
+      <div class="lt"><b style="font-size:12px">${esc(s.name)}</b>
+        <span>${esc(host(s.url))} · 深度${s.pages} · ${s.lastScan ? '扫描 ' + esc(s.lastScan) + ' · +' + s.lastNew : '未扫描'}</span></div>
+      <button class="ghost" data-ws="${s.id}" data-act="wsToggle">${s.enabled ? '停用' : '启用'}</button>
+      <button class="ghost" data-ws="${s.id}" data-act="wsDel">删</button>
+    </div>`).join('') || '<div class="empty">还没有盯梢源 · 在下方添加</div>';
+
+  const cs = WATCH.candidates || [];
+  if (!cs.length) { $('#wCands').innerHTML = '<div class="empty">候选池为空 · 点「立即扫描」抓取盯梢源</div>'; }
+  else {
+    $('#wCands').innerHTML = cs.map(c => {
+      const llm = c.llm;
+      const rel = llm ? (llm.relevant ? '<span class="pill s-已填">符合</span>' : '<span class="pill s-挂">不符</span>') : '<span class="pill">未过滤</span>';
+      const meta = [c.date, (llm && llm.city), (llm && llm.deadline && '截止' + llm.deadline), (llm && llm.target)].filter(Boolean).map(esc).join(' · ');
+      return `<div class="lrow">
+        ${rel}
+        <div class="lt"><b style="font-size:12.5px">${esc(c.title)}</b>
+          <span>${meta || esc(host(c.url))} ${llm && llm.reason ? '· ' + esc(llm.reason) : ''}</span></div>
+        <div class="meta">${c.sources.map((s, i) => '源' + (i + 1)).join('+')} ${esc(c.sources.join(' ').slice(0, 0))}</div>
+        <button class="ghost" data-ck="${c.key}" data-act="accept">收</button>
+        <button class="ghost" data-ck="${c.key}" data-act="ignore">忽略</button>
+        <button class="ghost" data-ck="${c.key}" data-act="delete">删</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+async function doScan() {
+  $('#btnScan').disabled = true; $('#ovScan').disabled = true;
+  goto('watch');
+  try { await api('/api/watch/scan', {}); } catch (e) { alert(e.message); }
+  poll();
+}
+$('#btnScan').addEventListener('click', doScan);
+$('#ovScan').addEventListener('click', doScan);
+$('#ovGotoWatch').addEventListener('click', () => goto('watch'));
+$('#ovGotoQueue').addEventListener('click', () => goto('queue'));
+$('#btnWCfg').addEventListener('click', async () => {
+  try {
+    await api('/api/watch/config', { prompt: $('#wPrompt').value, intervalHours: +$('#wInterval').value });
+    $('#wScanState').textContent = '已保存扫描设置';
+  } catch (e) { alert(e.message); }
+});
+$('#btnWPrompt').addEventListener('click', async () => {
+  try { await api('/api/watch/config', { prompt: $('#wPrompt').value }); poll(); } catch (e) { alert(e.message); }
+});
+$('#btnWsAdd').addEventListener('click', async () => {
+  const url = $('#wsUrl').value.trim();
+  if (!url.startsWith('http')) return alert('URL 必须以 http 开头');
+  try {
+    await api('/api/watch/sources/add', { name: $('#wsName').value.trim() || url.slice(0, 24), url, pages: +$('#wsPages').value || 3 });
+    $('#wsUrl').value = ''; $('#wsName').value = '';
+    poll();
+  } catch (e) { alert(e.message); }
+});
+$('#wSources').addEventListener('click', async e => {
+  const act = e.target.dataset && e.target.dataset.act;
+  if (!act) return;
+  const id = +e.target.dataset.ws;
+  try {
+    if (act === 'wsDel') { if (confirm('删除该盯梢源？')) await api('/api/watch/sources/delete/' + id, {}); else return; }
+    if (act === 'wsToggle') {
+      const s = (WATCH.sources || []).find(x => x.id === id);
+      await api('/api/watch/sources/update', { id, patch: { enabled: !s.enabled } });
+    }
+    poll();
+  } catch (err) { alert(err.message); }
+});
+$('#wCands').addEventListener('click', async e => {
+  const act = e.target.dataset && e.target.dataset.act;
+  if (!act) return;
+  const key = e.target.dataset.ck;
+  const btn = e.target;
+  try {
+    if (act === 'accept') { btn.textContent = '收录中…'; const r = await api('/api/watch/candidate', { key, action: 'accept' }); btn.textContent = '已收#' + r.ledgerId; }
+    else { await api('/api/watch/candidate', { key, action: act }); }
+    poll();
+  } catch (err) { alert(err.message); poll(); }
+});
+
+$('#btnAll').addEventListener('click', () => {
+  const es = (STATE.ledger.entries || []);
+  if (SEL.size >= es.length) SEL.clear(); else es.forEach(e => SEL.add(e.id));
+  render();
+});
+$('#btnQueue').addEventListener('click', async () => {
+  if (!SEL.size) return alert('先勾选要投的条目');
+  const ids = [...SEL];
+  if (!confirm(`批量打开 ${ids.length} 个职位页？（逐个错峰开页，你逐页核对填充，提交永远自己点）`)) return;
+  $('#btnQueue').disabled = true;
+  try { await api('/api/queue/start', { ids }); } catch (e) { alert(e.message); }
+  $('#btnQueue').disabled = false;
+  poll();
+});
+$('#ledger').addEventListener('click', async e => {
+  const act = e.target.dataset && e.target.dataset.act;
+  const row = e.target.closest('.lrow');
+  if (row && !act) { SELID = SELID === +row.dataset.id ? null : +row.dataset.id; render(); return; }
+  if (!act) return;
+  const id = +e.target.dataset.id;
+  try {
+    if (act === 'open') await api('/api/open/' + id);
+    if (act === 'yitou') await api('/api/ledger/update', { id, patch: { status: '已投' } });
+    if (act === 'tag') { e.target.textContent = '标签中…'; await api('/api/llm/tag/' + id).catch(x => { throw x }); }
+    if (act === 'del') { if (confirm('删除这条台账？')) await api('/api/ledger/delete/' + id); else return; }
+    poll();
+  } catch (err) { alert(err.message); poll(); }
+});
+$('#btnCollect').addEventListener('click', async () => {
+  const i = $('#tabSel').value;
+  if (i === '') return alert('没有可收录的标签页');
+  $('#btnCollect').disabled = true; $('#btnCollect').textContent = '收录中…';
+  try {
+    const r = await api('/api/collect', { index: +i });
+    $('#btnCollect').textContent = r.status === 'updated' ? '已在台账' : '已收录 #' + r.id;
+    SELID = r.id;
+  } catch (e) { alert(e.message); }
+  $('#btnCollect').disabled = false;
+  setTimeout(() => { $('#btnCollect').textContent = '收录此页'; }, 2000);
+  poll();
+});
+$('#btnLlm').addEventListener('click', async () => {
+  try {
+    await api('/api/config', { llm: { baseUrl: $('#llmBase').value, apiKey: $('#llmKey').value, model: $('#llmModel').value } });
+    poll();
+  } catch (e) { alert(e.message); }
+});
+async function openUrlInEdge(u, label) {
+  u = (u || '').trim();
+  if (!u) { alert('请输入网址'); return; }
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  $('#ovUrlState').textContent = '打开中…';
+  try {
+    await api('/api/open-url', { url: u });
+    $('#ovUrlState').textContent = '✓ 已在内置 Edge 打开' + (label ? '：' + label : '');
+  } catch (e) { $('#ovUrlState').textContent = '打开失败：' + e.message; }
+}
+$('#ovOpen').addEventListener('click', () => openUrlInEdge($('#ovUrl').value, ''));
+$('#ovUrl').addEventListener('keydown', e => { if (e.key === 'Enter') openUrlInEdge($('#ovUrl').value, ''); });
+$('#ovQQ').addEventListener('click', () => openUrlInEdge('https://mail.qq.com', 'QQ 邮箱'));
+$('#btnLlmTest').addEventListener('click', async () => {
+  $('#llmTest').textContent = '测试中…';
+  try {
+    const r = await api('/api/llm/selftest', {});
+    $('#llmTest').textContent = `✓ 通（${r.seconds}s）`;
+  } catch (e) { $('#llmTest').textContent = '✗ ' + e.message; }
+});
+$('#btnDraft').addEventListener('click', async () => {
+  const jd = $('#draftJd').value.trim() || ((STATE.ledger.entries || []).find(x => x.id === SELID) || {}).jd || '';
+  if (!jd || jd.length < 30) { $('#draftMsg').textContent = 'JD 太短：粘贴 JD 或先在队列选中一条台账记录'; $('#draftMsg').className = 'msg err'; return; }
+  $('#btnDraft').disabled = true; $('#btnDraft').textContent = '生成中…';
+  $('#draftMsg').textContent = '';
+  try {
+    const r = await api('/api/llm/draft', { jd, type: $('#draftType').value });
+    $('#draftOut').style.display = 'block'; $('#draftOut').textContent = r.content;
+    $('#btnCopyDraft').style.display = '';
+    $('#draftMsg').textContent = '✓ 已生成 · 请核对修改（AI 只用档案内事实）';
+  } catch (e) { $('#draftMsg').textContent = e.message; $('#draftMsg').className = 'msg err'; }
+  $('#btnDraft').disabled = false; $('#btnDraft').textContent = '生成初稿';
+});
+$('#btnCopyDraft').addEventListener('click', () => {
+  navigator.clipboard.writeText($('#draftOut').textContent).then(() => { $('#btnCopyDraft').textContent = '已复制'; setTimeout(() => $('#btnCopyDraft').textContent = '复制初稿', 1500); });
+});
+let PROFILE = null, resumeSaveTimer = null, resumeSaveSeq = 0;
+
+function maskId(s) { s = String(s || ''); return s.length > 10 ? s.slice(0, 6) + '********' + s.slice(-4) : s; }
+function pathGet(o, path) { return path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o); }
+function pathSet(o, path, val) {
+  const ks = path.split('.');
+  let t = o;
+  for (let i = 0; i < ks.length - 1; i++) {
+    const k = ks[i];
+    if (t[k] == null) t[k] = /^\d+$/.test(ks[i + 1]) ? [] : {};
+    t = t[k];
+  }
+  t[ks[ks.length - 1]] = val;
+}
+function setResumeState(txt, cls) {
+  const el = $('#resumeSaveState');
+  if (!el) return;
+  el.textContent = txt;
+  el.style.color = cls === 'err' ? '#C6484E' : cls === 'run' ? '#7A6420' : cls === 'ok' ? '#2F6E51' : '#A6A7AE';
+}
+function rSec(title, inner) {
+  return `<div class="rsec"><h4>${esc(title)}</h4>${inner || '<div class="empty">未填写</div>'}</div>`;
+}
+function rDateRange(x) {
+  if (x.range) return x.range;
+  const a = x.startDate || '', b = x.endDate || '';
+  return [a, b].filter(Boolean).join(' ~ ');
+}
+/* 可编辑值：data-path 指向 PROFILE 里的落点；编辑后失焦自动保存 */
+function eKv(label, val, path, multi) {
+  const v = String(val == null ? '' : val).trim();
+  const cls = 'redit' + (v ? '' : ' miss');
+  if (multi) return `<div class="rkv" style="grid-column:1/-1"><label>${esc(label)}</label><div class="${cls}" data-path="${esc(path)}" data-multi="1" contenteditable="true" spellcheck="false">${esc(v || '—')}</div></div>`;
+  return `<div class="rkv"><label>${esc(label)}</label><b class="${cls}" data-path="${esc(path)}" contenteditable="true" spellcheck="false">${esc(v || '—')}</b></div>`;
+}
+function eText(val, path) {
+  const v = String(val == null ? '' : val).trim();
+  return `<div class="rlong redit ${v ? '' : 'miss'}" data-path="${esc(path)}" data-multi="1" contenteditable="true" spellcheck="false">${esc(v || '—')}</div>`;
+}
+function renderResume(p) {
+  const el = $('#resumeView');
+  if (!el) return;
+  PROFILE = p;
+  const base = (p && p.base) || {};
+  const j = base.basic || {};
+  const ec = j.emergencyContact || {};
+  const A = k => `base.basic.${k}`;
+  const rows = [
+    ['姓名', 'name'], ['姓名拼音缩写', 'nameSpellAbb'], ['性别', 'gender'],
+    ['出生年月', 'birthDate'], ['出生日期(完整)', 'birthDateFull'], ['证件类型', 'idType'],
+    ['民族', 'nation'], ['政治面貌', 'politicalStatus'], ['婚姻状况', 'maritalStatus'],
+    ['健康状况', 'health'], ['是否留学生', 'isForeignStudent'], ['是否应届', 'isFreshGrad'],
+    ['身高 (cm)', 'stature'], ['体重 (kg)', 'weight'], ['户口性质', 'hukouNature'],
+    ['籍贯', 'hometown'], ['生源地', 'gaokaoSource'], ['户口所在地', 'hukou'],
+    ['家庭所在地', 'homePlace'], ['现居城市', 'cityNow'], ['家庭住址', 'address'],
+    ['毕业日期', 'graduationDate'], ['到岗年月', 'availableFrom'], ['到岗日期(完整)', 'availableFromFull'],
+    ['工作性质', 'jobNature'], ['期望城市', 'cityExpected'], ['第二期望城市', 'cityExpected2'],
+    ['期望月薪', 'salaryExpected'], ['期望岗位', 'job'], ['英语水平', 'englishLevel'],
+    ['英语成绩', 'englishScore'], ['特长', 'speciality'], ['爱好', 'hobby'],
+    ['GitHub', 'github'], ['QQ', 'qq'], ['微信', 'wechat'], ['手机号', 'phone'], ['电子邮箱', 'email'],
+  ];
+  let h = rSec('基本信息', `<div class="rgrid">${rows.map(r => eKv(r[0], j[r[1]], A(r[1]))).join('')}
+    <div class="rkv"><label>身份证号（打码只读）</label><b class="miss">${esc(maskId(j.idCard) || '—')}</b></div>
+    ${eKv('紧急联系人', ec.name, 'base.basic.emergencyContact.name')}
+    ${eKv('紧急联系电话', ec.phone, 'base.basic.emergencyContact.phone')}
+  </div>`);
+
+  h += rSec('教育背景', (base.education || []).map((e, i) => `
+    <div class="ritem"><div class="rgrid">
+      ${eKv('学校', e.school, `base.education.${i}.school`)}
+      ${eKv('专业', e.major, `base.education.${i}.major`)}
+      ${eKv('学历', e.degree, `base.education.${i}.degree`)}
+      ${eKv('院系', e.department, `base.education.${i}.department`)}
+      ${eKv('城市', e.city, `base.education.${i}.city`)}
+      ${eKv('起止时间', rDateRange(e), `base.education.${i}.range`)}
+      ${eKv('均分', e.avgScore, `base.education.${i}.avgScore`)}
+      ${eKv('排名', e.rank, `base.education.${i}.rank`)}
+      ${eKv('主修课程', e.majorCourses, `base.education.${i}.majorCourses`, true)}
+    </div></div>`).join(''));
+
+  h += rSec('实习 / 工作经历', (base.internships || []).map((it, i) => `
+    <div class="ritem"><div class="rgrid">
+      ${eKv('公司', it.company, `base.internships.${i}.company`)}
+      ${eKv('岗位', it.position, `base.internships.${i}.position`)}
+      ${eKv('起止时间', rDateRange(it), `base.internships.${i}.range`)}
+      ${eKv('证明人', it.refName, `base.internships.${i}.refName`)}
+      ${eKv('证明人电话', it.refPhone, `base.internships.${i}.refPhone`)}
+      ${eKv('工作内容', it.description, `base.internships.${i}.description`, true)}
+    </div></div>`).join(''));
+
+  h += rSec('项目经历', (base.projects || []).map((pr, i) => `
+    <div class="ritem"><div class="rgrid">
+      ${eKv('项目名称', pr.name, `base.projects.${i}.name`)}
+      ${eKv('角色', pr.role, `base.projects.${i}.role`)}
+      ${eKv('起止时间', rDateRange(pr), `base.projects.${i}.range`)}
+      ${eKv('链接', pr.link, `base.projects.${i}.link`)}
+      ${eKv('项目描述', pr.description, `base.projects.${i}.description`, true)}
+    </div></div>`).join(''));
+
+  const skills = base.skills || [];
+  h += rSec('专业技能与自述',
+    (skills.length ? `<div class="rtags">${skills.map(s => `<span>${esc(s)}</span>`).join('')}</div>` : '') +
+    `<div style="margin-top:10px">${eText(base.skillSummary, 'base.skillSummary')}</div>`);
+
+  h += rSec('自我介绍模板', eText(base.selfIntro, 'base.selfIntro'));
+
+  h += rSec('家庭成员', (base.family || []).map((f, i) => `
+    <div class="ritem"><div class="rgrid">
+      ${eKv('姓名', f.name, `base.family.${i}.name`)}
+      ${eKv('关系', f.relation, `base.family.${i}.relation`)}
+      ${eKv('工作单位', f.workplace, `base.family.${i}.workplace`)}
+      ${eKv('职务', f.duty, `base.family.${i}.duty`)}
+    </div></div>`).join(''));
+
+  const oq = base.openQuestions || [];
+  if (oq.length) h += rSec('开放题模板', oq.map((q, i) => `
+    <div class="ritem">
+      ${eKv('标题', q.title, `base.openQuestions.${i}.title`)}
+      <div style="margin-top:6px">${eText(q.content, `base.openQuestions.${i}.content`)}</div>
+    </div>`).join(''));
+
+  const variants = (p && p.variants) || {};
+  const vkeys = Object.keys(variants);
+  if (vkeys.length) h += rSec('求职方向变体（在 JSON 高级编辑里改）', vkeys.map(k => {
+    const v = variants[k] || {}, ov = v.overrides || {};
+    return `<div class="ritem"><div class="t"><b>${esc(v.label || k)}</b><span>${esc((ov.basic && ov.basic.job) || '')}</span></div></div>`;
+  }).join(''));
+
+  h += `<div class="rfoot">档案更新：${esc((PROFILE && PROFILE.updatedAt) || '—')} · schema v${esc((PROFILE && PROFILE.schemaVersion) || 1)}</div>`;
+  el.innerHTML = h;
+}
+function scheduleResumeSave() {
+  clearTimeout(resumeSaveTimer);
+  setResumeState('编辑中…', '');
+  resumeSaveTimer = setTimeout(doResumeSave, 900);
+}
+async function doResumeSave() {
+  if (!PROFILE) return;
+  const seq = ++resumeSaveSeq;
+  setResumeState('保存中…', 'run');
+  PROFILE.updatedAt = new Date().toISOString().slice(0, 10);
+  try {
+    await api('/api/profile', { profile: PROFILE });
+    if (seq !== resumeSaveSeq) return;
+    setResumeState('已自动保存 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }), 'ok');
+    $('#profArea').value = JSON.stringify(PROFILE, null, 2);
+    const rf = document.querySelector('#resumeView .rfoot');
+    if (rf) rf.textContent = '档案更新：' + PROFILE.updatedAt + ' · schema v' + (PROFILE.schemaVersion || 1);
+  } catch (e) {
+    setResumeState('保存失败：' + e.message, 'err');
+  }
+}
+$('#resumeView').addEventListener('focusin', e => {
+  const t = e.target.closest('.redit');
+  if (!t) return;
+  if (t.textContent.trim() === '—') {
+    t.textContent = '';
+    t.classList.remove('miss');
+    try {
+      const r = document.createRange(); r.selectNodeContents(t); r.collapse(false);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch (err) {}
+  }
+});
+$('#resumeView').addEventListener('paste', e => {
+  const t = e.target.closest && e.target.closest('.redit');
+  if (!t) return;
+  e.preventDefault();
+  const txt = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
+  document.execCommand('insertText', false, txt);
+});
+$('#resumeView').addEventListener('keydown', e => {
+  const t = e.target.closest && e.target.closest('.redit');
+  if (!t) return;
+  if (e.key === 'Enter' && !t.dataset.multi) { e.preventDefault(); t.blur(); }
+});
+$('#resumeView').addEventListener('blur', e => {
+  const t = e.target.closest && e.target.closest('.redit');
+  if (!t) return;
+  const path = t.dataset.path;
+  if (!path || !PROFILE) return;
+  let v = '';
+  try { v = (t.innerText || t.textContent || '').replace(/\u00a0/g, ' ').replace(/\n{3,}/g, '\n\n').trim(); } catch (err) {}
+  if (!v) { t.textContent = '—'; t.classList.add('miss'); } else { t.classList.remove('miss'); }
+  const cur = pathGet(PROFILE, path);
+  if (String(cur == null ? '' : cur) === v) return;
+  pathSet(PROFILE, path, v);
+  scheduleResumeSave();
+}, true);
+$('#btnProfEdit').addEventListener('click', () => { $('#profEditCard').style.display = 'block'; });
+$('#btnProfClose').addEventListener('click', () => { $('#profEditCard').style.display = 'none'; });
+$('#btnProfLoad').addEventListener('click', async () => {
+  const p = await api('/api/profile');
+  $('#profArea').value = JSON.stringify(p, null, 2);
+  $('#profMsg').textContent = '';
+  renderResume(p);
+});
+$('#btnProfSave').addEventListener('click', async () => {
+  try {
+    const j = JSON.parse($('#profArea').value);
+    await api('/api/profile', { profile: j });
+    const p2 = await api('/api/profile');
+    renderResume(p2);
+    $('#profMsg').textContent = '✓ 已保存并热更新注入数据（新页面生效）';
+    $('#profMsg').className = 'msg';
+  } catch (e) { $('#profMsg').textContent = '保存失败：' + e.message; $('#profMsg').className = 'msg err'; }
+});
+function impMark(i, cls, sym) {
+  const s = $('#ist' + i);
+  s.classList.remove('run', 'ok');
+  if (cls) s.classList.add(cls);
+  if (sym) s.querySelector('.no').textContent = sym;
+}
+$('#btnImp').addEventListener('click', async () => {
+  $('#btnImp').disabled = true;
+  $('#impSteps').style.display = 'block';
+  $('#impState').textContent = '检测中…';
+  impMark(1, 'run');
+  impMark(2); impMark(3); impMark(4);
+  try {
+    const r = await api('/api/edge/import-identity', {});
+    if (r.needClose) {
+      impMark(1, 'run');
+      $('#ist1t').textContent = '发现日常 Edge 正在运行 → 请完全退出日常 Edge（含托盘/后台）后重试';
+      $('#impState').textContent = '等待关闭日常 Edge';
+      $('#btnImp').disabled = false;
+      return;
+    }
+    if (!r.ok) {
+      impMark(1);
+      $('#impState').textContent = r.message || '导入失败';
+      $('#impState').style.color = '#C6484E';
+      $('#btnImp').disabled = false;
+      return;
+    }
+    impMark(1, 'ok', '✓'); impMark(2, 'ok', '✓');
+    impMark(3, 'ok', '✓');
+    const n = (r.copied || []).length;
+    $('#ist3').querySelector('.t span').textContent = `已复制 ${n} 个文件（收藏夹/密码/Cookie/自动填充/密钥）`;
+    impMark(4, 'ok', '✓');
+    $('#impState').textContent = r.restarted ? '导入完成 ✓「浏览」页签现在就是你的收藏和登录态'
+                                             : '导入完成 ✓（求职 Edge 重启失败，可从托盘手动重启）';
+    $('#impState').style.color = '#2F6E51';
+  } catch (e) {
+    $('#impState').textContent = '导入失败：' + e.message;
+    $('#impState').style.color = '#C6484E';
+  }
+  $('#btnImp').disabled = false;
+});
+async function loadLogs() {
+  try { const r = await api('/api/logs'); $('#logs').textContent = (r.lines || []).join('\n') || '（暂无日志）'; } catch (e) {}
+}
+
+(async function boot() {
+  goto((location.hash || '#overview').slice(1));
+  await poll();
+  const p = await api('/api/profile');
+  $('#profArea').value = JSON.stringify(p, null, 2);
+  renderResume(p);
+  $('#llmBase').value = (STATE.llm || {}).baseUrl || '';
+  $('#llmModel').value = (STATE.llm || {}).model || '';
+  setInterval(poll, 2500);
+  setInterval(loadLogs, 5000);
+  loadLogs();
+})();
+</script>
+</body>
+</html>

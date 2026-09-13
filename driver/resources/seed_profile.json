@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "",
+  "_说明": "AF-Fill 空白档案模板（首次运行自动复制为你的档案）。日期统一 YYYY-MM；带 *Full 后缀的是含日完整日期；起止时间统一 'YYYY.MM-YYYY.MM'。改完在面板「Profile」Tab 导入，或在任意网申页手工填写后用「采集本页已填→Profile」回填。",
+  "base": {
+    "basic": {
+      "name": "",
+      "idType": "身份证",
+      "idCard": "",
+      "phone": "",
+      "email": "",
+      "gender": "",
+      "birthDate": "",
+      "birthDateFull": "",
+      "nation": "汉族",
+      "politicalStatus": "",
+      "maritalStatus": "",
+      "health": "健康",
+      "hometown": "",
+      "gaokaoSource": "",
+      "hukou": "",
+      "cityNow": "",
+      "address": "",
+      "isFreshGrad": "是",
+      "graduationDate": "",
+      "cityExpected": "",
+      "cityExpected2": "",
+      "salaryExpected": "",
+      "availableFrom": "",
+      "availableFromFull": "",
+      "jobNature": "全职",
+      "job": "",
+      "github": "",
+      "qq": "",
+      "wechat": "",
+      "englishLevel": "",
+      "englishScore": "",
+      "hobby": "",
+      "emergencyContact": {
+        "name": "",
+        "phone": ""
+      }
+    },
+    "education": [
+      {
+        "school": "",
+        "major": "",
+        "degree": "本科",
+        "startDate": "",
+        "endDate": "",
+        "range": ""
+      }
+    ],
+    "projects": [],
+    "internships": [],
+    "skills": [],
+    "skillSummary": "",
+    "selfIntro": "面试官您好，我是{{name}}，期待加入{{company}}。",
+    "family": [],
+    "openQuestions": [
+      {
+        "type": "selfIntro",
+        "tags": ["通用"],
+        "title": "自我介绍 · 模板",
+        "content": "面试官您好，我是{{name}}，{{school}}{{major}}专业应届本科生。在校期间我完成了{{project}}等项目，具备从需求拆解到落地的完整能力；实习中我参与了{{internship}}相关的工作。我学习能力强、执行力高，期待加入{{company}}，把技术做成实际价值。"
+      },
+      {
+        "type": "whyUs",
+        "tags": ["通用"],
+        "title": "为什么选择 {{company}} · 模板",
+        "content": "我关注到{{company}}在核心业务上的技术投入与应届生培养体系。我在校期间围绕相关方向做过完整项目，实习中积累了工程实践经验，希望能从可交付的小模块做起，把已有的工程习惯带到{{company}}的团队里。"
+      }
+    ],
+    "customFields": [],
+    "fieldFlags": {}
+  },
+  "variants": {
+    "backend": { "label": "后端开发", "overrides": { "basic": { "job": "后端开发工程师" } } },
+    "frontend": { "label": "前端开发", "overrides": { "basic": { "job": "前端开发工程师" } } },
+    "management": { "label": "管理/协调岗", "overrides": { "basic": { "job": "项目管理/运营协调" } } }
+  }
+}

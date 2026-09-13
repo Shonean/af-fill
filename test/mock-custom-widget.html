@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星桥人才 · 自绘组件（Phase 3 验证页）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.6 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#EDEEF1;color:#26282E}
+.top{background:#fff;border-bottom:1px solid rgba(20,20,22,.1);padding:14px 22px;display:flex;gap:14px;align-items:baseline}
+.top b{font-size:15px}
+.top span{font-size:12px;color:#83858D}
+.tip{max-width:880px;margin:16px auto 0;padding:10px 16px;background:#FCF6E8;border:1px solid #E8D9A8;border-radius:10px;font-size:12px;color:#7A6420}
+.ats{max-width:880px;margin:18px auto 80px;padding:0 16px}
+.card{background:#fff;border:1px solid rgba(20,20,22,.1);border-radius:12px;padding:26px 30px 30px;margin-bottom:18px}
+h2{font-size:14.5px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+h2::before{content:"";width:3px;height:14px;background:#7A5B9E;border-radius:1px}
+h2 small{font-weight:400;font-size:11px;color:#9A9CA3}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;margin-top:14px}
+.f label{display:block;font-size:12px;color:#5A5C64;margin-bottom:5px}
+.note2{font-size:11px;color:#9A9CA3;margin-top:4px}
+/* —— antd 风格自绘下拉（类名与真 antd 一致，验证引擎的 WIDGET_SEL / OVERLAY 选择器） —— */
+.ant-select{position:relative;display:inline-flex;align-items:center;width:100%;min-height:36px;background:#F6F6F8;
+  border:1px solid rgba(20,20,22,.12);border-radius:8px;padding:2px 11px;cursor:pointer;box-sizing:border-box}
+.ant-select .ant-select-selection-search-input{position:absolute;inset:0;width:1px;opacity:0;border:none;background:none}
+.ant-select .ant-select-selection-item{font-size:13.5px;color:#26282E;pointer-events:none}
+.ant-select .ant-select-selection-placeholder{position:absolute;font-size:13.5px;color:#B4B5BB;pointer-events:none}
+.ant-select-open{border-color:#7A5B9E}
+.ant-select-dropdown{position:absolute;z-index:999;margin-top:4px;background:#fff;border:1px solid rgba(20,20,22,.12);
+  border-radius:9px;box-shadow:0 8px 28px rgba(20,20,22,.14);padding:5px;display:none;max-height:220px;overflow:auto;width:100%}
+.ant-select-dropdown.ant-select-dropdown-open{display:block}
+.ant-select-item-option{padding:7px 10px;border-radius:6px;font-size:13.5px;cursor:pointer}
+.ant-select-item-option:hover{background:#F3F0F8}
+.ant-select-item-option-selected{background:#EDE7F5}
+/* —— 级联（element 风格） —— */
+.el-cascader{position:relative;display:inline-flex;width:100%;min-height:36px;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:8px;cursor:pointer}
+.el-cascader .el-input__inner{position:absolute;inset:0;border:none;background:none;padding:0 11px;font:13.5px/34px inherit;color:#26282E;pointer-events:none}
+.el-cascader__dropdown{position:absolute;z-index:999;top:100%;left:0;margin-top:4px;background:#fff;border:1px solid rgba(20,20,22,.12);
+  border-radius:9px;box-shadow:0 8px 28px rgba(20,20,22,.14);padding:5px;display:none;width:100%}
+.el-cascader__dropdown.el-open{display:block}
+.el-cascader-node{padding:7px 10px;border-radius:6px;font-size:13.5px;cursor:pointer}
+.el-cascader-node:hover{background:#F0F4F8}
+/* —— antd 风格 DatePicker（readonly input） —— */
+.ant-picker{position:relative;display:inline-flex;align-items:center;width:100%;min-height:36px;background:#F6F6F8;border:1px solid rgba(20,20,22,.12);border-radius:8px;padding:2px 11px}
+.ant-picker input{width:100%;border:none;background:none;font:13.5px/1.5 inherit;color:#26282E;cursor:pointer}
+.state{position:sticky;top:14px;float:right;width:250px;background:#141416;color:#E8E8EC;border-radius:12px;padding:14px 16px;font:11px/1.7 ui-monospace,Consolas,monospace}
+.state h3{font:500 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#8B8D96;margin-bottom:8px}
+.state pre{white-space:pre-wrap;word-break:break-all;max-height:420px;overflow:auto;color:#D9C9EF}
+.submit{margin-top:18px;background:#7A5B9E;color:#fff;border:none;border-radius:9px;padding:10px 34px;font-size:13.5px;font-weight:500}
+.note{font-size:12px;color:#9A9CA3;margin-left:12px}
+</style>
+</head>
+<body>
+<div class="top"><b>星桥人才</b><span>2026 届校招 · 自绘下拉 / 级联 / 日期组件 · Phase 3 验证页</span></div>
+<div class="tip" style="max-width:880px">
+本页用 <b>antd / element 的真实类名</b>模拟组件库自绘控件（无任何框架，纯 CSS + 少量 JS）：
+自绘下拉（城市）、<b>可搜索下拉</b>（学校，输入过滤）、<b>级联</b>（省 → 市，选省后才加载市）、<b>readonly 日期</b>。
+<b>Phase 3 验收</b>：白瓷球 → 扫描 → 这些自绘控件应出现在清单里（kind=widget）；执行填充时应自动打开下拉、点中匹配项、
+右侧 State 面板同步变化；匹配不到的选项应琥珀闪烁并提示「请手选」，<b>绝不盲点</b>。本页直接内载脚本本体。
+</div>
+<div class="ats">
+  <div class="state"><h3>STATE — 组件收到的值</h3><pre id="st">…</pre></div>
+  <main class="card">
+    <h2>组件库表单 <small>自绘下拉 · 搜索下拉 · 级联 · readonly 日期</small></h2>
+    <div class="grid">
+      <div class="f"><label>姓名</label><input id="w-name" type="text" placeholder="普通输入框（对照）"></div>
+      <div class="f">
+        <label>期望工作城市<span style="color:#C6484E">*</span></label>
+        <div class="ant-select" id="w-city">
+          <input class="ant-select-selection-search-input" aria-label="期望工作城市" readonly>
+          <span class="ant-select-selection-placeholder">请选择城市</span>
+          <span class="ant-select-selection-item" style="display:none"></span>
+        </div>
+        <div class="ant-select-dropdown" data-for="w-city">
+          <div class="ant-select-item-option">北京</div>
+          <div class="ant-select-item-option">上海</div>
+          <div class="ant-select-item-option">深圳</div>
+          <div class="ant-select-item-option">杭州</div>
+          <div class="ant-select-item-option">成都</div>
+          <div class="ant-select-item-option">济南</div>
+          <div class="ant-select-item-option">日照</div>
+        </div>
+      </div>
+      <div class="f">
+        <label>毕业院校</label>
+        <div class="ant-select ant-select-show-search" id="w-school">
+          <input class="ant-select-selection-search-input" aria-label="毕业院校" readonly>
+          <span class="ant-select-selection-placeholder">输入关键词搜索</span>
+          <span class="ant-select-selection-item" style="display:none"></span>
+        </div>
+        <div class="ant-select-dropdown" data-for="w-school"></div>
+        <div class="note2">可搜索下拉：引擎应输入「示例」后点选「示例工业大学」</div>
+      </div>
+      <div class="f">
+        <label>籍贯（级联：省 → 市）</label>
+        <div class="el-cascader" id="w-native">
+          <input class="el-input__inner" aria-label="籍贯" readonly placeholder="先选省，再选市">
+        </div>
+        <div class="el-cascader__dropdown" data-for="w-native"></div>
+        <div class="note2">市级选项在选省 400ms 后才异步加载 —— 验证等待浮层逻辑</div>
+      </div>
+      <div class="f">
+        <label>出生年月（readonly 日期）</label>
+        <div class="ant-picker" id="w-birth"><input aria-label="出生年月" readonly placeholder="2004.06"></div>
+        <div class="note2">引擎应临时移除 readonly 写入后恢复</div>
+      </div>
+      <div class="f"><label>手机号</label><input id="w-phone" type="tel" maxlength="11" placeholder="11位手机号"></div>
+    </div>
+    <button class="submit" type="button">提交申请</button>
+    <span class="note">AF-Fill 永远不会点击这个按钮</span>
+  </main>
+</div>
+<script>
+(function () {
+  const st = { name: '', city: '', school: '', native: '', birth: '', phone: '' };
+  const view = document.getElementById('st');
+  const render = () => view.textContent = JSON.stringify(st, null, 1);
+  render();
+  document.getElementById('w-name').addEventListener('input', e => { st.name = e.target.value; render(); });
+  document.getElementById('w-phone').addEventListener('input', e => { st.phone = e.target.value; render(); });
+
+  /* 普通自绘下拉 */
+  const city = document.getElementById('w-city');
+  const cityDd = document.querySelector('.ant-select-dropdown[data-for="w-city"]');
+  const cityItem = city.querySelector('.ant-select-selection-item');
+  const cityPh = city.querySelector('.ant-select-selection-placeholder');
+  function bindSelect(sel, dd, onPick) {
+    const item = sel.querySelector('.ant-select-selection-item'), ph = sel.querySelector('.ant-select-selection-placeholder');
+    sel.addEventListener('click', () => {
+      document.querySelectorAll('.ant-select-dropdown-open,.el-open').forEach(x => x.classList.remove('ant-select-dropdown-open', 'el-open'));
+      dd.classList.add('ant-select-dropdown-open'); sel.classList.add('ant-select-open');
+      dd.style.width = sel.getBoundingClientRect().width + 'px';
+    });
+    dd.addEventListener('click', e => {
+      const op = e.target.closest('.ant-select-item-option');
+      if (!op) return;
+      item.textContent = op.textContent; item.style.display = ''; ph.style.display = 'none';
+      dd.classList.remove('ant-select-dropdown-open'); sel.classList.remove('ant-select-open');
+      dd.querySelectorAll('.ant-select-item-option-selected').forEach(x => x.classList.remove('ant-select-item-option-selected'));
+      op.classList.add('ant-select-item-option-selected');
+      onPick(op.textContent);
+    });
+  }
+  bindSelect(city, cityDd, v => { st.city = v; render(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.ant-select') && !e.target.closest('.ant-select-dropdown')) {
+      document.querySelectorAll('.ant-select-dropdown-open').forEach(x => x.classList.remove('ant-select-dropdown-open'));
+      document.querySelectorAll('.ant-select-open').forEach(x => x.classList.remove('ant-select-open'));
+    }
+    if (!e.target.closest('.el-cascader') && !e.target.closest('.el-cascader__dropdown')) {
+      document.querySelectorAll('.el-open').forEach(x => x.classList.remove('el-open'));
+    }
+  });
+
+  /* 可搜索下拉：input 收到 input 事件才过滤（模拟 antd showSearch） */
+  const SCHOOL = ['示例工业大学', '示例理工大学', '江苏大学', '南京工业大学', '苏州科技大学', '无锡学院'];
+  const school = document.getElementById('w-school');
+  const schoolDd = document.querySelector('.ant-select-dropdown[data-for="w-school"]');
+  const schoolInput = school.querySelector('.ant-select-selection-search-input');
+  schoolInput.removeAttribute('readonly');
+  schoolInput.addEventListener('input', () => {
+    const q = schoolInput.value.trim();
+    schoolDd.innerHTML = '';
+    SCHOOL.filter(s => !q || s.includes(q)).forEach(s => {
+      const d = document.createElement('div'); d.className = 'ant-select-item-option'; d.textContent = s;
+      schoolDd.appendChild(d);
+    });
+    schoolDd.classList.add('ant-select-dropdown-open'); school.classList.add('ant-select-open');
+    schoolDd.style.width = school.getBoundingClientRect().width + 'px';
+  });
+  bindSelect(school, schoolDd, v => { st.school = v; render(); });
+
+  /* 级联：省 →（400ms 后异步加载）市 */
+  const PROV = { '山东省': ['济南市', '青岛市', '济宁市', '日照市'], '江苏省': ['南京市', '苏州市', '无锡市'] };
+  const casc = document.getElementById('w-native');
+  const cascDd = document.querySelector('.el-cascader__dropdown[data-for="w-native"]');
+  const cascInput = casc.querySelector('.el-input__inner');
+  casc.addEventListener('click', () => {
+    cascDd.classList.add('el-open');
+    cascDd.innerHTML = '';
+    Object.keys(PROV).forEach(p => {
+      const d = document.createElement('div'); d.className = 'el-cascader-node'; d.textContent = p;
+      cascDd.appendChild(d);
+    });
+    cascDd.style.width = casc.getBoundingClientRect().width + 'px';
+  });
+  cascDd.addEventListener('click', e => {
+    const node = e.target.closest('.el-cascader-node');
+    if (!node) return;
+    const t = node.textContent;
+    if (PROV[t]) {                                     // 一级：异步加载二级
+      cascDd.innerHTML = '<div style="padding:7px 10px;font-size:12px;color:#9A9CA3">加载中…</div>';
+      setTimeout(() => {
+        cascDd.innerHTML = '';
+        PROV[t].forEach(c => {
+          const d = document.createElement('div'); d.className = 'el-cascader-node'; d.textContent = c;
+          cascDd.appendChild(d);
+        });
+      }, 400);
+    } else {                                           // 二级：完成
+      cascInput.value = node.textContent;
+      cascDd.classList.remove('el-open');
+      st.native = node.textContent; render();
+    }
+  });
+
+  /* readonly 日期：只接受 input 事件（readonly 已被引擎临时移除才能触发） */
+  const birth = document.querySelector('.ant-picker input');
+  birth.addEventListener('input', () => {
+    st.birth = birth.value;
+    birth.closest('.ant-picker').style.borderColor = '#4C9E7E';
+    render();
+  });
+})();
+</script>
+<script src="../autofill.user.js"></script>
+</body>
+</html>
