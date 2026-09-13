@@ -21,6 +21,12 @@ import shutil
 import subprocess
 import sys
 
+try:                                     # Windows CI/控制台常为 cp1252，中文输出会 UnicodeEncodeError
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 DRIVER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(DRIVER)
 ART = os.path.join(DRIVER, 'build_artifacts')
